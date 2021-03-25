@@ -26,9 +26,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
-        child: SvgPicture.asset(
-            'assets/images/splash/datasite_logo.svg',
-        )
+        child: Image.asset('assets/images/splash/datasite_logo.png',),
       ),
     );
   }

@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:online_shop/pages/cart_page.dart';
+import 'package:online_shop/widgets/drawer_one_widget.dart';
+import 'package:online_shop/widgets/drawer_two_widget.dart';
+import 'package:online_shop/widgets/product_cart%20_widget.dart';
+import 'package:online_shop/widgets/product_category_widget.dart';
+import 'package:online_shop/widgets/slider_widget.dart';
 
 class HomePage extends StatefulWidget {
   static final String id = 'home_page';
@@ -10,11 +16,60 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   bool isSearch = false;
 
+  List<Widget> productCarts = [
+    ProductCard(),
+    ProductCard(),
+    ProductCard(),
+    ProductCard(),
+  ];
+
+  List<String> categoryTexts = [
+    "Eng yaxshi takliflar",
+    "Aksiya",
+    "Arzonlashtirilgan mahsulotlar",
+    "Eng ko'p sotiladigan mahsulotlar",
+  ];
+
+  List<String> imagesReklama = [
+    'assets/images/adds/add_1.jpg',
+    'assets/images/adds/add_2.webp',
+    'assets/images/adds/add_3.webp',
+    'assets/images/adds/add_4.webp',
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      appBar: AppBar(
+      appBar: isSearch ? AppBar(
+        backgroundColor: Colors.green,
+        leading: null,
+        title: Container(
+          padding: EdgeInsets.symmetric(horizontal: 5),
+          width: double.infinity,
+          height: 32,
+          decoration: BoxDecoration(
+              color: Colors.green[700],
+              borderRadius: BorderRadius.circular(5),),
+          child: TextField(
+            style: TextStyle(
+              color: Colors.white
+            ),
+            decoration: InputDecoration(
+                border: InputBorder.none,
+                hintText: 'Qidiruv',
+                hintStyle: TextStyle(fontSize: 14.5, color: Colors.white)),
+          ),
+        ),
+        actions: [
+          FlatButton(onPressed: () {
+            setState(() {
+              isSearch = !isSearch;
+            });
+          }, child: Text('Yopish', style: TextStyle(color: Colors.white),),
+          padding: EdgeInsets.all(0),)
+        ],
+      ): AppBar(
         backgroundColor: Colors.green,
         title: Container(
           width: double.infinity,
@@ -41,100 +96,33 @@ class _HomePageState extends State<HomePage> {
             icon: Icon(
               Icons.shopping_cart,
             ),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pushNamed(context, CartPage.id);
+            },
           )
         ],
       ),
-      drawer: Drawer(),
+
+      // ###drawer###
+      drawer: DrawerTwo(),
       body: SingleChildScrollView(
         child: Column(
           children: [
             // #reklama
             Container(
               height: 275,
-              color: Colors.red,
+              color: Colors.white,
+              child: SliderWidget(
+                images: imagesReklama,
+                texts: categoryTexts,
+                size: MediaQuery.of(context).size.width / 275,
+              ),
             ),
 
             //kategoriyalar
-            Container(
-              height: 320,
-              margin: EdgeInsets.only(bottom: 20),
-              color: Colors.white,
-              child: Column(
-                children: [
-                  SizedBox(height: 7.5,),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 15),
-                    alignment: Alignment.center,
-                    height: 40,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Eng yaxshi takliflar', style: TextStyle(fontSize: 16),),
-                        FlatButton(
-                          height: 30,
-                          color: Colors.green[50],
-                          textColor: Colors.green,
-                          onPressed: () {},
-                          child: Text('Barchasi',),
-                        )
-                      ],
-                    ),
-                  ),
-                  Divider(),
-                  Expanded(child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    children: [
-                      SizedBox(width: 10,),
-                      Container(
-                        margin: EdgeInsets.only(left: 10, right: 10, bottom: 10),
-                        width: 140,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          //mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Container(
-                              height: 155,
-                              width: 140,
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  image: AssetImage('assets/images/product/product_1.png'),
-                                )
-                              ),
-                              alignment: Alignment.topCenter,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Container(
-                                    height: 20,
-                                    width: 40,
-                                    decoration: BoxDecoration(
-                                      border: Border.all(color: Colors.white, width: 2),
-                                      color: Colors.red
-                                    ),
-
-                                  ),
-                                  IconButton(icon: Icon(Icons.add_circle_outline_rounded, color: Colors.green, size: 32,), onPressed: () {}, padding: EdgeInsets.all(0),),
-                                ],
-                              ),
-                            ),
-                            SizedBox(height: 10,),
-                            Row(
-                              children: [
-                                Text('Price: 5000 ', style: TextStyle(color: Colors.green, fontSize: 16),),
-                                Text("so'm", style: TextStyle(color: Colors.grey, fontSize: 14),)
-                              ],
-                            ),
-                            SizedBox(height: 10,),
-                            Text('Description: descr iption descri ption descri ption', style: TextStyle(fontWeight: FontWeight.w400),),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),),
-                ],
-              ),
-            ),
+            Column(
+              children: List<Widget>.from(categoryTexts.map((text) => ProductCategoryWidget(productCarts: productCarts, categoryTheme: text,),)).toList(),
+            )
           ],
         ),
       ),

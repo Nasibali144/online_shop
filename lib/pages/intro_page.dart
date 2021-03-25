@@ -32,7 +32,9 @@ class _IntroPageState extends State<IntroPage> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          Container(
+
+          // Til tanlash bu hozircha emas keyinroq qo'shiladi.
+          /*Container(
             alignment: Alignment.centerRight,
             width: double.infinity,
             padding: EdgeInsets.only(
@@ -46,9 +48,9 @@ class _IntroPageState extends State<IntroPage> {
                   fontWeight: FontWeight.w700,
                   fontSize: 18),
             ),
-          ),
+          ),*/
 
-          //
+          // #PageView - rasm bilan kontentlarni slide qiladi
           Expanded(
             child: PageView(
               controller: _pageController,
@@ -76,8 +78,8 @@ class _IntroPageState extends State<IntroPage> {
               ],
             ),
           ),
-          //
 
+          // #navbar - pastdagi 'o'tkazib yuborish, indikator, iconbuttonlar'
           Container(
             height: 70,
             alignment: Alignment.center,
@@ -89,10 +91,17 @@ class _IntroPageState extends State<IntroPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                    child: currentIndex != 2 ? Text(
-                  "O'TKAZIB YUBORISH",
-                  style: TextStyle(color: Colors.black, fontSize: 16),
-                ) : SizedBox.shrink(),
+                  child: currentIndex != 2
+                      ? GestureDetector(
+                          child: Text(
+                            "O'TKAZIB YUBORISH",
+                            style: TextStyle(color: Colors.black, fontSize: 16),
+                          ),
+                    onTap: () {
+                            Navigator.pushReplacementNamed(context, RegistrationPage.id);
+                    },
+                        )
+                      : SizedBox.shrink(),
                 ),
                 Expanded(
                   child: Row(
@@ -101,23 +110,30 @@ class _IntroPageState extends State<IntroPage> {
                   ),
                 ),
                 Expanded(
-                  child: currentIndex != 2 ? IconButton(
-                    padding: EdgeInsets.only(right: 15),
-                    alignment: Alignment.centerRight,
-                    icon: Icon(Icons.arrow_forward_ios),
-                    onPressed: () {
-                      // Sign in pagega o'tadi
-                    },
-                  ) : GestureDetector(
-                    child: Text(
-                      "KEYINGI",
-                      style: TextStyle(color: Colors.black, fontSize: 16),
-                      textAlign: TextAlign.right,
-                    ),
-                    onTap: () {
-                      Navigator.pushReplacementNamed(context, RegistrationPage.id);
-                    },
-                  ),
+                  child: currentIndex != 2
+                      ? IconButton(
+                          padding: EdgeInsets.only(right: 15),
+                          alignment: Alignment.centerRight,
+                          icon: Icon(Icons.arrow_forward_ios),
+                          onPressed: () {
+                            setState(() {
+                              currentIndex++;
+                              _pageController.nextPage(duration: Duration(milliseconds: 500), curve: Curves.ease);
+                            });
+                            // Sign in pagega o'tadi
+                          },
+                        )
+                      : GestureDetector(
+                          child: Text(
+                            "KEYINGI",
+                            style: TextStyle(color: Colors.black, fontSize: 16),
+                            textAlign: TextAlign.right,
+                          ),
+                          onTap: () {
+                            Navigator.pushReplacementNamed(
+                                context, RegistrationPage.id);
+                          },
+                        ),
                 )
               ],
             ),
