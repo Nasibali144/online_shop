@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:online_shop/pages/product_list_page.dart';
+import 'package:online_shop/pages/product/product_list_page.dart';
 
 class ProductCategoryWidget extends StatelessWidget {
   const ProductCategoryWidget({

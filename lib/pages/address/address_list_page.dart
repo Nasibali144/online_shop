@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:online_shop/pages/add_address_page.dart';
-import 'package:online_shop/pages/change_address_page.dart';
+import 'package:online_shop/pages/address/add_address_page.dart';
+import 'package:online_shop/pages/address/change_address_page.dart';
 import 'package:online_shop/pages/home_page.dart';
 
 class AddressListPage extends StatefulWidget {

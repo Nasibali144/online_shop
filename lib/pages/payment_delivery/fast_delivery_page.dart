@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:online_shop/pages/drawer/choose_payment_page.dart';
-import 'package:online_shop/pages/drawer/delivery_type_page.dart';
+import 'package:online_shop/pages/payment_delivery/choose_payment_page.dart';
+import 'package:online_shop/pages/payment_delivery/delivery_type_page.dart';
 import 'package:online_shop/utils/time_utils.dart';
 
 class FastDeliveryPage extends StatefulWidget {

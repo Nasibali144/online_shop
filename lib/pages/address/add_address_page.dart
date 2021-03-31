@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:online_shop/pages/address_list_page.dart';
-import 'drawer/choose_dictrict_page.dart';
+import 'package:online_shop/pages/address/address_list_page.dart';
+import 'choose_dictrict_page.dart';
 
 class AddAddressPage extends StatefulWidget {
 

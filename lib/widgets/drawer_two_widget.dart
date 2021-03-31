@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:online_shop/pages/address_list_page.dart';
-import 'package:online_shop/pages/create_account_page.dart';
+import 'package:online_shop/pages/address/address_list_page.dart';
+import 'package:online_shop/pages/authentication/create_account_page.dart';
 import 'package:online_shop/pages/drawer/answer_question_page.dart';
 import 'package:online_shop/pages/drawer/public_offer_page.dart';
-import 'package:online_shop/pages/favorite_products_page.dart';
-import 'package:online_shop/pages/viewed_products_page.dart';
+import 'package:online_shop/pages/product/favorite_products_page.dart';
+import 'package:online_shop/pages/product/viewed_products_page.dart';
 
 const DividerFor = Divider(
   height: 0,

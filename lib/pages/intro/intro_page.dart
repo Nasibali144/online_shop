@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:online_shop/pages/registration_with_phone.dart';
+import 'package:online_shop/pages/authentication/create_registration_page.dart';
+import 'package:online_shop/pages/authentication/registration_with_phone.dart';
 import 'package:online_shop/utils/strings.dart';
 
 class IntroPage extends StatefulWidget {
@@ -98,7 +99,7 @@ class _IntroPageState extends State<IntroPage> {
                             style: TextStyle(color: Colors.black, fontSize: 16),
                           ),
                     onTap: () {
-                            Navigator.pushReplacementNamed(context, RegistrationPage.id);
+                            Navigator.pushReplacementNamed(context, CreateRegistrationPage.id);
                     },
                         )
                       : SizedBox.shrink(),
@@ -131,7 +132,7 @@ class _IntroPageState extends State<IntroPage> {
                           ),
                           onTap: () {
                             Navigator.pushReplacementNamed(
-                                context, RegistrationPage.id);
+                                context, CreateRegistrationPage.id);
                           },
                         ),
                 )

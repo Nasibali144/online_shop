@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:online_shop/pages/create_account_page.dart';
+import 'package:online_shop/pages/authentication/create_account_page.dart';
 
 class SmsCodePage extends StatefulWidget {
 

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/cart_cuonter_page.dart';
+import '../../widgets/cart_cuonter_page.dart';
 
 class ViewedProductPage extends StatefulWidget {
 

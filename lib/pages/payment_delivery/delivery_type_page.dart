@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:online_shop/pages/fast_delivery_page.dart';
+import 'package:online_shop/pages/payment_delivery/fast_delivery_page.dart';
 
-import '../table_delivery_page.dart';
+import 'table_delivery_page.dart';
 
 class DeliveryType extends StatefulWidget {
 

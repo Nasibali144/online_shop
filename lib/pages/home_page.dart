@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:online_shop/pages/cart_page.dart';
+import 'package:online_shop/pages/product/cart_page.dart';
 import 'package:online_shop/widgets/drawer_one_widget.dart';
 import 'package:online_shop/widgets/drawer_two_widget.dart';
 import 'package:online_shop/widgets/product_cart%20_widget.dart';

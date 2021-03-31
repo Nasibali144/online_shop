@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:online_shop/pages/registration_with_sms.dart';
+import 'package:online_shop/pages/authentication/registration_with_sms.dart';
 import 'package:online_shop/widgets/dialog_widget.dart';
 
 class RegistrationPage extends StatefulWidget {
@@ -46,9 +45,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
           // #logo
           SizedBox(height: 80,),
-          SvgPicture.asset(
-              'assets/images/splash/datasite_logo.svg'
-          ),
+
+          Image.asset("assets/images/splash/datasite_logo.png", height: 100,),
+//              'assets/images/splash/datasite_logo.svg'
+
 
           // #text
           SizedBox(height: 30,),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:online_shop/pages/drawer/approve_order_page.dart';
+import 'package:online_shop/pages/payment_delivery/approve_order_page.dart';
 
 class CardTypes extends StatefulWidget {
 

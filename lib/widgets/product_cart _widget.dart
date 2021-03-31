@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:online_shop/pages/detail_page.dart';
+import 'package:online_shop/pages/product/detail_page.dart';
 
 class ProductCard extends StatefulWidget {
 

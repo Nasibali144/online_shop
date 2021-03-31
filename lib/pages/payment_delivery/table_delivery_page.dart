@@ -2,9 +2,9 @@ import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:online_shop/pages/drawer/choose_payment_page.dart';
+import 'package:online_shop/pages/payment_delivery/choose_payment_page.dart';
 
-import 'drawer/delivery_type_page.dart';
+import 'delivery_type_page.dart';
 
 
 class TableDeliveryPage extends StatelessWidget {

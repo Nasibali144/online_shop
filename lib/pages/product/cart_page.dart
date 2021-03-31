@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:online_shop/pages/drawer/delivery_type_page.dart';
-import '../widgets/cart_cuonter_page.dart';
+import 'package:online_shop/pages/payment_delivery/delivery_type_page.dart';
+import '../../widgets/cart_cuonter_page.dart';
 
 class CartPage extends StatefulWidget {
 
