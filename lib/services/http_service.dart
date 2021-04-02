@@ -9,7 +9,8 @@ class Network{
 
   /* Http Apis */
 
-  static String API_BANNER = '/api/v1/banner/'; // {ID}
+  static String API_BANNER = '/api/v1/banner/'; // {ID} GET
+  static String API_PRODUCT = '/api/v1/product/'; //{ID} GET
 
 
   /* Http Requests */
@@ -80,11 +81,19 @@ class Network{
 
   /* Http Parsing */
 
-  // static ProductList parseProList(String body) {
-  //   dynamic json = jsonDecode(body);
-  //   return ProductList.fromJson(json);
-  // }
+  // FOR Product list
+  static ProductList parseProList(String body) {
+    dynamic json = jsonDecode(utf8.decode(body.codeUnits));
+    return ProductList.fromJson(json);
+  }
 
+  // FOR One Product
+  static Product parseOneProduct(String body) {
+    dynamic json = jsonDecode(utf8.decode(body.codeUnits));
+    return Product.fromJson(json);
+  }
+
+  // FOR Banner
   static BannerList parseBanners(String body) {
     dynamic json = jsonDecode(body);
     return BannerList.fromJson(json);

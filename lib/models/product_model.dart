@@ -1,49 +1,49 @@
 import 'category_model.dart';
 
 class Product {
+  int id;
   String name;
   String price;
   String image;
-  List<Category> category;
   String description;
   String slug;
+  bool isSale;
+  int category;
 
   Product(
-      {this.name,
+      {this.id,
+        this.name,
         this.price,
         this.image,
-        this.category,
         this.description,
-        this.slug});
+        this.slug,
+        this.isSale,
+        this.category});
 
   Product.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
     name = json['name'];
     price = json['price'];
     image = json['image'];
-    if (json['category'] != null) {
-      category = new List<Category>();
-      json['category'].forEach((v) {
-        category.add(new Category.fromJson(v));
-      });
-    }
     description = json['description'];
     slug = json['slug'];
+    isSale = json['is_sale'];
+    category = json['category'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
     data['name'] = this.name;
     data['price'] = this.price;
     data['image'] = this.image;
-    if (this.category != null) {
-      data['category'] = this.category.map((v) => v.toJson()).toList();
-    }
     data['description'] = this.description;
     data['slug'] = this.slug;
+    data['is_sale'] = this.isSale;
+    data['category'] = this.category;
     return data;
   }
 }
-
 
 class ProductList{
   List<Product> products;
