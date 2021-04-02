@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:online_shop/models/banner_model.dart';
 import 'package:online_shop/pages/product/cart_page.dart';
-import 'package:online_shop/widgets/drawer_one_widget.dart';
+import 'package:online_shop/services/http_service.dart';
 import 'package:online_shop/widgets/drawer_two_widget.dart';
 import 'package:online_shop/widgets/product_cart%20_widget.dart';
 import 'package:online_shop/widgets/product_category_widget.dart';
@@ -14,6 +16,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
   bool isSearch = false;
 
   List<Widget> productCarts = [
@@ -30,12 +33,31 @@ class _HomePageState extends State<HomePage> {
     "Eng ko'p sotiladigan mahsulotlar",
   ];
 
-  List<String> imagesReklama = [
-    'assets/images/adds/add_1.jpg',
-    'assets/images/adds/add_2.webp',
-    'assets/images/adds/add_3.webp',
-    'assets/images/adds/add_4.webp',
-  ];
+  // start
+
+  List<String> imagesReklama = new List();
+  BannerList _banners;
+
+  _getBannerList() {
+    Network.GET(Network.API_BANNER, Network.paramEmpty()).then((response) => {
+      _parsingBanner(response)
+    });
+  }
+
+  _parsingBanner(String response) {
+    _banners = Network.parseBanners(response);
+    for(BannerModel banner in _banners.banners) {
+      setState(() {
+        imagesReklama.add(banner.image.toString());
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _getBannerList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -109,15 +131,7 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           children: [
             // #reklama
-            Container(
-              height: 275,
-              color: Colors.white,
-              child: SliderWidget(
-                images: imagesReklama,
-                texts: categoryTexts,
-                size: MediaQuery.of(context).size.width / 275,
-              ),
-            ),
+            _bannerWidget(),
 
             //kategoriyalar
             Column(
@@ -125,6 +139,23 @@ class _HomePageState extends State<HomePage> {
             )
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _bannerWidget() {
+    print(MediaQuery.of(context).size.width);
+    return Container(
+       width: MediaQuery.of(context).size.width,
+       height: MediaQuery.of(context).size.width * 603 / 1922,
+      child: new Swiper(
+        autoplay: true,
+        autoplayDelay: 3000,
+        layout: SwiperLayout.DEFAULT,
+        itemCount: imagesReklama.length,
+        itemBuilder: (BuildContext context, int index) {
+          return Image(image: NetworkImage(imagesReklama[index]));
+        },
       ),
     );
   }

@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:online_shop/models/account/user_data.dart';
 import 'package:online_shop/pages/address/address_list_page.dart';
 import 'package:online_shop/pages/authentication/create_account_page.dart';
+import 'package:online_shop/pages/authentication/create_registration_page.dart';
 import 'package:online_shop/pages/drawer/answer_question_page.dart';
 import 'package:online_shop/pages/drawer/public_offer_page.dart';
 import 'package:online_shop/pages/product/favorite_products_page.dart';
 import 'package:online_shop/pages/product/viewed_products_page.dart';
+import 'package:online_shop/services/http_auth.dart';
+import 'package:provider/provider.dart';
 
 const DividerFor = Divider(
   height: 0,
@@ -14,6 +18,17 @@ const DividerFor = Divider(
 );
 
 class DrawerTwo extends StatelessWidget {
+
+  void _logOut(BuildContext context) {
+    HttpAuth.POST(HttpAuth.API_LOGOUT_CREATE, HttpAuth.paramEmpty(), HttpAuth.headersWithToken(context)).then((response) {
+      if(response.containsKey('success')) {
+        Provider.of<UserData>(context, listen: false).removeUser();
+        Provider.of<UserData>(context, listen: false).removeToken();
+        Navigator.pop(context);
+        Navigator.pushReplacementNamed(context, CreateRegistrationPage.id);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -211,16 +226,17 @@ class DrawerTwo extends StatelessWidget {
             ),
           ),
           DividerFor,
-          GestureDetector(
-            child: Container(
-              color: Colors.white,
-              child: ListTile(
-                leading: Icon(
-                  Icons.exit_to_app_rounded,
-                  color: Colors.indigo,
-                ),
-                title: Text('Tizimdan chiqish'),
+          Container(
+            color: Colors.white,
+            child: ListTile(
+              onTap: () {
+                _logOut(context);
+              },
+              leading: Icon(
+                Icons.exit_to_app_rounded,
+                color: Colors.indigo,
               ),
+              title: Text('Tizimdan chiqish'),
             ),
           ),
         ],

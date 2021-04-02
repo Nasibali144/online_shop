@@ -11,7 +11,7 @@ class DialogUtils {
         context: context,
         builder: (context) => new AlertDialog(
           title: new Text(title),
-          content: new Text(content),u
+          content: new Text(content),
           actions: <Widget>[
             FlatButton(
               child: Text(button),

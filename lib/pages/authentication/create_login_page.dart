@@ -1,64 +1,51 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:online_shop/models/account/user_data.dart';
 import 'package:online_shop/models/account/user_model.dart';
 import 'package:online_shop/pages/home_page.dart';
 import 'package:online_shop/services/http_auth.dart';
 import 'package:online_shop/utils/dialog_util.dart';
 import 'package:provider/provider.dart';
-import 'create_account_page.dart';
+import 'package:online_shop/models/account/user_data.dart';
 
-class CreateRegistrationPage extends StatefulWidget {
+// ignore: must_be_immutable
+class CreateLoginPage extends StatelessWidget {
 
-  static final String id = "create_registration_page";
-
-  @override
-  _CreateRegistrationPageState createState() => _CreateRegistrationPageState();
-}
-
-class _CreateRegistrationPageState extends State<CreateRegistrationPage> {
-
-  bool isLoading = false;
+  static final String id = "create_login_page";
 
   var usernameController = TextEditingController();
   var emailController = TextEditingController();
-  var password1Controller = TextEditingController();
-  var password2Controller = TextEditingController();
+  var passwordController = TextEditingController();
 
 
-  void _apiCreate(User user) {
-    HttpAuth.POST(HttpAuth.API_REGISTRATION_CREATE, HttpAuth.paramCreate(user), HttpAuth.headers).then((response) {
+  void _apiCreate(User user, BuildContext context) {
+    HttpAuth.POST(HttpAuth.API_LOGIN_CREATE, HttpAuth.paramCreateForLogin(user), HttpAuth.headers).then((response) {
       print('Response my api:  $response');
-      _checkResponse(response);
+      _checkResponse(response, context);
     });
   }
 
-  _checkResponse(Map<String, String> response){
+  _checkResponse(Map<String, String> response, BuildContext context){
 
     if(response.containsKey('success'))
     {
       Map _json = HttpAuth.parseApiKey(response['success']);
       print(_json['key']);
       Provider.of<UserData>(context, listen: false).storeToken(_json['key']);
-      setState(() {
-        isLoading = false;
-      });
+      Provider.of<UserData>(context, listen: false).loadingProgress();
 
       ////### bag###
       Navigator.of(context).pushReplacement(MaterialPageRoute(
-          builder: (context) => CreateAccount()
+          builder: (context) => HomePage()
       ));
     } else if(response.containsKey('error')) {
       List errors = HttpAuth.errorMessage(response['error']);
       var text = '';
       for(var item in errors) {
-        text += item;
+        text += item.toString();
         text += " ";
       }
 
-      setState(() {
-        isLoading = false;
-      });
+      Provider.of<UserData>(context, listen: false).loadingProgress();
 
       DialogUtils.dialogShow(
         title: "Iltimos e'tibor bering!",
@@ -67,9 +54,7 @@ class _CreateRegistrationPageState extends State<CreateRegistrationPage> {
         button: "Qaytadan urinish",
       );
     } else {
-      setState(() {
-        isLoading = false;
-      });
+      Provider.of<UserData>(context, listen: false).loadingProgress();
       DialogUtils.dialogShow(
         title: "Uzr tizimda xatolik",
         content: "Dasturni qayta ishga tushurishingizni so'raymiz!",
@@ -80,24 +65,19 @@ class _CreateRegistrationPageState extends State<CreateRegistrationPage> {
     }
   }
 
-  _doRegistration() {
+  _doRegistration(BuildContext  context) {
     String username = usernameController.text.trim().toString();
     String email = emailController.text.trim().toString();
-    String password1 = password1Controller.text.trim().toString();
-    String password2 = password1Controller.text.trim().toString();
+    String password = passwordController.text.trim().toString();
 
-    setState(() {
-      isLoading = true;
-    });
+    Provider.of<UserData>(context, listen: false).loadingProgress();
 
-    if(username.isNotEmpty && email.isNotEmpty && password1.isNotEmpty && (password2 == password1)) {
-      User _user = User(username: username, email: email, password: password1);
+    if(username.isNotEmpty && email.isNotEmpty && password.isNotEmpty) {
+      User _user = User(username: username, email: email, password: password);
       Provider.of<UserData>(context, listen: false).user = _user;
-      _apiCreate(_user);
+      _apiCreate(_user, context);
     } else {
-      setState(() {
-        isLoading = false;
-      });
+      Provider.of<UserData>(context, listen: false).loadingProgress();
       DialogUtils.dialogShow(title: 'Diqqat!', context: context, content: "Iltimos barcha maydonlarni to'ldiring", button: "Yopish");
     }
   }
@@ -179,7 +159,7 @@ class _CreateRegistrationPageState extends State<CreateRegistrationPage> {
                     height: 20,
                   ),
                   TextField(
-                    controller: password1Controller,
+                    controller: passwordController,
                     cursorColor: Colors.green,
                     autofocus: true,
                     decoration: InputDecoration(
@@ -196,35 +176,9 @@ class _CreateRegistrationPageState extends State<CreateRegistrationPage> {
                       ),
                     ),
                     style: TextStyle(color: Colors.black, fontSize: 18),
-                    keyboardType: TextInputType.name,
+                    keyboardType: TextInputType.multiline,
                   ),
 
-                  // # nomer
-
-                  SizedBox(
-                    height: 10,
-                  ),
-                  // #email
-                  TextField(
-                    controller: password2Controller,
-                    cursorColor: Colors.green,
-                    autofocus: true,
-                    decoration: InputDecoration(
-                      labelText: "Parolingizni tasdiqlang",
-                      labelStyle: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w300),
-                      enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.green),
-                      ),
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.green),
-                      ),
-                    ),
-                    style: TextStyle(color: Colors.black, fontSize: 18),
-                    keyboardType: TextInputType.emailAddress,
-                  ),
                   SizedBox(
                     height: 25,
                   ),
@@ -242,14 +196,16 @@ class _CreateRegistrationPageState extends State<CreateRegistrationPage> {
                         'DAVOM ETTIRISH',
                         style: TextStyle(fontSize: 18),
                       ),
-                      onPressed: _doRegistration,
+                      onPressed: () {
+                        _doRegistration(context);
+                      },
                     ),
                   ),
                 ],
               ),
             ),
 
-            isLoading ? Center(child: CircularProgressIndicator()) : SizedBox.shrink(),
+            Provider.of<UserData>(context).isLoading ? Center(child: CircularProgressIndicator()) : SizedBox.shrink(),
           ],
         ),
       ),

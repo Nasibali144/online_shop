@@ -1,28 +1,30 @@
+import 'dart:io';
+
+import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:online_shop/models/account/user_data.dart';
 import 'package:online_shop/models/account/user_model.dart';
 import 'package:online_shop/pages/home_page.dart';
 import 'package:online_shop/services/http_auth.dart';
 import 'package:online_shop/services/http_cart.dart';
-import 'package:online_shop/services/pref_service.dart';
+import 'package:online_shop/utils/dialog_util.dart';
+import 'package:provider/provider.dart';
 
 class CreateAccount extends StatefulWidget {
   static final String id = 'create_account_page';
-
-  final String username;
-  final String email;
-
-  CreateAccount({this.username, this.email});
 
   @override
   _CreateAccountState createState() => _CreateAccountState();
 }
 
 class _CreateAccountState extends State<CreateAccount> {
+  // date
+  final format1 = DateFormat("yyyy-MM-dd");
 
   bool isLoading = false;
 
   String gender = 'Jinsingiz';
-  String token;
   var usernameController = TextEditingController();
   var first_nameController = TextEditingController();
   var last_nameController = TextEditingController();
@@ -31,26 +33,61 @@ class _CreateAccountState extends State<CreateAccount> {
   var birth_dateController = TextEditingController();
 
   void _apiUpdate(User user) {
-    HttpAuth.PUT(HttpAuth.API_USER_UPDATE, HttpAuth.paramUpdate(user), token).then((response) {
+    HttpAuth.PUT(HttpAuth.API_USER_UPDATE, HttpAuth.paramUpdate(user), HttpAuth.headersWithToken(context)).then((response) {
+      print("Put dagi response: ${response.toString()}");
       _checkResponse(response);
     });
   }
 
-  _checkResponse(String response){
-    User _user = HttpAuth.parseUser(response);
-    Pref.storeUser(_user);
-    print(_user.username);
+  _checkResponse(Map<String, String> response){
+    if(response.containsKey('success'))
+    {
+      User _user = HttpAuth.parseUser(response['success']);
+      Provider.of<UserData>(context, listen: false).storeUser(_user);
+      print(_user.username);
 
-    ////
-    // cart yaratib ketadi
-    setState(() {
-      isLoading = false;
-    });
-    HttpCart.POST(HttpCart.BASE, HttpCart.paramEmpty(), token).then((value) {
-      print(value);
-    });
-    ////
-    Navigator.of(context).pushReplacementNamed(HomePage.id);
+      // cart yaratib ketadi
+      setState(() {
+        isLoading = false;
+      });
+      HttpCart.POST(HttpCart.BASE, HttpCart.paramEmpty(), HttpCart.headersWithToken(context)).then((value) {
+        print(value);
+      });
+
+
+      Navigator.of(context).pushReplacementNamed(HomePage.id);
+    } else if(response.containsKey('error')) {
+      List errors = HttpAuth.errorMessage(response['error']);
+      var text = '';
+      for(var item in errors) {
+        text += item;
+        text += " ";
+      }
+
+      setState(() {
+        isLoading = false;
+      });
+
+      DialogUtils.dialogShow(
+        title: "Iltimos e'tibor bering!",
+        context: context,
+        content: text,
+        button: "Qaytadan urinish",
+      );
+    } else {
+
+      setState(() {
+        isLoading = false;
+      });
+
+      DialogUtils.dialogShow(
+        title: "Uzr tizimda xatolik",
+        content: "Dasturni qayta ishga tushurishingizni so'raymiz!",
+        context: context,
+        button: 'Dasturdan chiqish',
+      );
+      exit(0);
+    }
   }
 
   _doRegistration() {
@@ -67,29 +104,41 @@ class _CreateAccountState extends State<CreateAccount> {
     });
 
     if(username.isNotEmpty && email.isNotEmpty && first_name.isNotEmpty && last_name.isNotEmpty && phone_number.isNotEmpty && birth_date.isNotEmpty) {
-      _apiUpdate(User(username: username, email: email, first_name: first_name, last_name: last_name, phone_number: phone_number, birth_date: birth_date, gender: _gender));
+      var _user  = User(username: username, email: email, first_name: first_name, last_name: last_name, phone_number: phone_number, birth_date: birth_date, gender: _gender);
+      _apiUpdate(_user);
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+      DialogUtils.dialogShow(title: 'Diqqat!', context: context, content: "Iltimos barchmaydonlarni to'ldiring", button: "Yopish");
     }
   }
 
   @override
   void initState() {
     super.initState();
-    _getToken();
-    _getOldPageData();
+    Future.delayed(Duration.zero, () {
+      this._getOldPageData();
+    });
+
   }
 
-  void _getToken() {
-    Pref.loadToken().then((value) {
-      setState(() {
-        token = value;
-      });
-    });
-  }
 
   void _getOldPageData() {
     setState(() {
-      usernameController.text = widget.username;
-      emailController.text = widget.email;
+      var user = Provider.of<UserData>(context, listen: false).user;
+      if(user != null){
+        usernameController.text = user.username;
+        emailController.text = user.email;
+
+        if(user.id != null) {
+          first_nameController.text = user.first_name;
+          last_nameController.text = user.last_name;
+          birth_dateController.text = user.birth_date;
+          phone_numberController.text = user.phone_number;
+          gender = user.gender == 'male' ? 'Erkak': 'Ayol';
+        }
+      }
     });
   }
 
@@ -271,7 +320,7 @@ class _CreateAccountState extends State<CreateAccount> {
                   ),
 
                   // #birth_date
-                  TextField(
+                  /*TextField(
                     controller: birth_dateController,
                     cursorColor: Colors.green,
                     decoration: InputDecoration(
@@ -289,6 +338,30 @@ class _CreateAccountState extends State<CreateAccount> {
                     ),
                     style: TextStyle(color: Colors.black, fontSize: 18),
                     keyboardType: TextInputType.datetime,
+                  ),*/
+                  DateTimeField(
+                    controller: birth_dateController,
+                    decoration: InputDecoration(
+                      labelText: "Tug'ilgan kuningiz",
+                      labelStyle: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w300),
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.green),
+                      ),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.green),
+                      ),
+                    ),
+                    format: format1,
+                    onShowPicker: (context, currentValue) {
+                      return showDatePicker(
+                          context: context,
+                          firstDate: DateTime(1900),
+                          initialDate: currentValue ?? DateTime.now(),
+                          lastDate: DateTime(2050));
+                    },
                   ),
                   SizedBox(height: 25,),
 

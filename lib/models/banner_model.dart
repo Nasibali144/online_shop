@@ -1,10 +1,10 @@
-class Banner {
+class BannerModel {
   int id;
   String image;
 
-  Banner({this.id, this.image});
+  BannerModel({this.id, this.image});
 
-  Banner.fromJson(Map<String, dynamic> json) {
+  BannerModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     image = json['image'];
   }
@@ -17,13 +17,13 @@ class Banner {
   }
 }
 
-class BannerList{
-  List<Banner> banners;
+class BannerList {
+  List<BannerModel> banners;
 
   BannerList.fromJson(List<dynamic> json)
-      : banners = List<Banner>.from(json.map((x) => Banner.fromJson(x)));
+      : banners = List<BannerModel>.from(json.map((x) => BannerModel.fromJson(x)));
 
   List<dynamic> toJson() => [
-    List<Banner>.from(banners.map((x) => x.toJson()))
+    List<BannerModel>.from(banners.map((x) => x.toJson()))
   ];
 }

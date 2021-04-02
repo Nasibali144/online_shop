@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:online_shop/pages/address/add_address_page.dart';
+import 'package:online_shop/pages/authentication/create_login_page.dart';
 import 'package:online_shop/pages/authentication/create_registration_page.dart';
 import 'package:online_shop/pages/payment_delivery/add_bank_card_page.dart';
 import 'package:online_shop/pages/address/address_list_page.dart';
@@ -25,6 +26,10 @@ import 'package:online_shop/pages/authentication/registration_with_sms.dart';
 import 'package:online_shop/pages/intro/splash_page.dart';
 import 'package:online_shop/pages/payment_delivery/table_delivery_page.dart';
 import 'package:online_shop/pages/product/viewed_products_page.dart';
+import 'package:online_shop/pages/test_page.dart';
+import 'package:provider/provider.dart';
+
+import 'models/account/user_data.dart';
 
 void main() {
   runApp(MyApp());
@@ -33,45 +38,52 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+    return ChangeNotifierProvider(
+      create: (context) => UserData(),
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        //home: SplashPage(),
+        home: HomePage(),
+        routes: {
+          HomePage.id: (context) => HomePage(),
+          IntroPage.id: (context) => IntroPage(),
+          SplashPage.id: (context) => SplashPage(),
+          RegistrationPage.id: (context) => RegistrationPage(),
+          SmsCodePage.id: (context) => SmsCodePage(),
+          CreateAccount.id: (context) => CreateAccount(),
+          DetailPage.id: (context) => DetailPage(),
+          ViewedProductPage.id: (context) => ViewedProductPage(),
+          CartPage.id: (context) => CartPage(),
+          AddBankCard.id: (context) => AddBankCard(),
+          FavoriteProductsPage.id: (context) => FavoriteProductsPage(),
+          AddressListPage.id: (context) => AddressListPage(),
+          AddAddressPage.id: (context) => AddAddressPage(),
+          ProductListPage.id: (context) => ProductListPage(),
+          ChangeAddressPage.id: (context) => ChangeAddressPage(),
+          FastDeliveryPage.id: (context) => FastDeliveryPage(),
+          TableDeliveryPage.id: (context) => TableDeliveryPage(),
+          QuestionAnswer.id: (context) => QuestionAnswer(),
+          ApproveOrder.id: (context) => ApproveOrder(),
+          CardTypes.id: (context) => CardTypes(),
+          ChoseDistrict.id: (context) => ChoseDistrict(),
+          ChosePayment.id: (context) => ChosePayment(),
+          DeliveryType.id: (context) => DeliveryType(),
+          ProductsCatalogue.id: (context) => ProductsCatalogue(),
+          PublicOffer.id: (context) => PublicOffer(),
+          //
+
+
+          //
+          CreateRegistrationPage.id: (context) => CreateRegistrationPage(),
+          CreateLoginPage.id: (context) => CreateLoginPage(),
+
+          //
+          TestPage.id: (context) => TestPage(),
+        },
       ),
-      home: SplashPage(),
-      //home: CreateAccount(),
-      routes: {
-        HomePage.id: (context) => HomePage(),
-        IntroPage.id: (context) => IntroPage(),
-        SplashPage.id: (context) => SplashPage(),
-        RegistrationPage.id: (context) => RegistrationPage(),
-        SmsCodePage.id: (context) => SmsCodePage(),
-        CreateAccount.id: (context) => CreateAccount(),
-        DetailPage.id: (context) => DetailPage(),
-        ViewedProductPage.id: (context) => ViewedProductPage(),
-        CartPage.id: (context) => CartPage(),
-        AddBankCard.id: (context) => AddBankCard(),
-        FavoriteProductsPage.id: (context) => FavoriteProductsPage(),
-        AddressListPage.id: (context) => AddressListPage(),
-        AddAddressPage.id: (context) => AddAddressPage(),
-        ProductListPage.id: (context) => ProductListPage(),
-        ChangeAddressPage.id: (context) => ChangeAddressPage(),
-        FastDeliveryPage.id: (context) => FastDeliveryPage(),
-        TableDeliveryPage.id: (context) => TableDeliveryPage(),
-        QuestionAnswer.id: (context) => QuestionAnswer(),
-        ApproveOrder.id: (context) => ApproveOrder(),
-        CardTypes.id: (context) => CardTypes(),
-        ChoseDistrict.id: (context) => ChoseDistrict(),
-        ChosePayment.id: (context) => ChosePayment(),
-        DeliveryType.id: (context) => DeliveryType(),
-        ProductsCatalogue.id: (context) => ProductsCatalogue(),
-        PublicOffer.id: (context) => PublicOffer(),
-        //
-
-
-        //
-        CreateRegistrationPage.id: (context) => CreateRegistrationPage(),
-      },
     );
   }
 }

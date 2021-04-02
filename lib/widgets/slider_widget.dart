@@ -4,9 +4,8 @@ import 'package:flutter/material.dart';
 class SliderWidget extends StatefulWidget {
   double size;
   List<String> images;
-  List<String> texts;
 
-  SliderWidget({@required this.images, this.texts, @required this.size});
+  SliderWidget({@required this.images, @required this.size});
 
   @override
   _SliderWidgetState createState() => _SliderWidgetState();
@@ -17,7 +16,6 @@ class _SliderWidgetState extends State<SliderWidget> {
   PageController(initialPage: 1);
   int _currentIndex = 0;
   List _images;
-  List _text;
   Timer _timer;
   double _size;
 
@@ -25,7 +23,6 @@ class _SliderWidgetState extends State<SliderWidget> {
   void initState() {
     setState(() {
       _images = widget.images;
-      _text = widget.texts;
       _size = widget.size;
     });
     print(_images.asMap());
@@ -99,7 +96,7 @@ class _SliderWidgetState extends State<SliderWidget> {
                   child: ClipRRect(
                       borderRadius: BorderRadius.circular(5),
                       child: Image(
-                        image: AssetImage(item),
+                        image: NetworkImage(item),
                         //fit: BoxFit.cover,
                       )
                   ),
