@@ -2,7 +2,68 @@ import 'dart:convert';
 import 'package:online_shop/models/account/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'manage_route.dart';
+
 class Pref{
+  /*
+  source:
+  https://educity.app/flutter/the-right-way-to-use-shared-preferences-in-flutter
+  https://fluttercorner.com/how-to-store-and-get-data-from-shared-preferences-in-flutter/
+
+  example
+  //umumiy e'lon qilib olish
+  Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  final SharedPreferences prefs = await _prefs;
+
+  int counter = 10;
+
+  //store
+  prefs.setInt("counter", counter);
+  //load
+  prefs.getInt('counter');
+
+  //init state ni ichida ishlatib ketish
+  _counter = _prefs.then((SharedPreferences prefs) {
+      return (prefs.getInt('counter') ?? 0);
+    });
+  */
+  // update new code
+  static Pref _pref;
+  static SharedPreferences _preferences;
+  static Future<Pref> getInstance() async {
+    if (_pref == null) {
+      var secureStorage = Pref._();
+      await secureStorage._init();
+      _pref = secureStorage;
+    }
+    return _pref;
+  }
+
+  Pref._();
+
+  Future _init() async {
+    _preferences = await SharedPreferences.getInstance();
+  }
+
+  // get string
+  static String loadAuthStatus({String defValue = 'NO DATA IN STATUS DATABASE'}) {
+    if (_preferences == null) return defValue;
+    return _preferences.getString("status") ?? defValue;
+  }
+
+  // put string
+  static Future<bool> storeAuthStatus(AuthStatus status) {
+    if (_preferences == null) return null;
+    return _preferences.setString("status", ManageNavigation.getStatus(status));
+  }
+
+  // clear string
+  static Future<bool> removeAuthStatus() {
+    if (_preferences == null) return null;
+    return _preferences.remove("status");
+  }
+  //////////////////
+
   // for key
   static storeToken(String token) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -18,6 +79,22 @@ class Pref{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.remove("token");
   }
+
+  // for auth
+  // static storeAuthStatus(AuthStatus status) async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   prefs.setString("status", ManageNavigation.getStatus(status));
+  // }
+
+  // static Future<String> loadAuthStatus() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   return prefs.getString("status");
+  // }
+
+  // static Future<bool> removeAuthStatus() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   return prefs.remove("status");
+  // }
 
   // for user
   static storeUser(User user) async {

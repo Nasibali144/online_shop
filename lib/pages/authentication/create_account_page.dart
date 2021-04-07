@@ -9,6 +9,7 @@ import 'package:online_shop/pages/home_page.dart';
 import 'package:online_shop/services/http_auth.dart';
 import 'package:online_shop/services/http_cart.dart';
 import 'package:online_shop/utils/dialog_util.dart';
+import 'package:online_shop/utils/msg_util.dart';
 import 'package:provider/provider.dart';
 
 class CreateAccount extends StatefulWidget {
@@ -24,7 +25,11 @@ class _CreateAccountState extends State<CreateAccount> {
 
   bool isLoading = false;
 
-  String gender = 'Jinsingiz';
+  List<String> genderList = [
+    'Erkak',
+    'Ayol',
+  ];
+  String gender;
   var usernameController = TextEditingController();
   var first_nameController = TextEditingController();
   var last_nameController = TextEditingController();
@@ -54,7 +59,7 @@ class _CreateAccountState extends State<CreateAccount> {
         print(value);
       });
 
-
+      MsgUtil.fireToast("Ma'lumotlaringiz 'Mening profilim' bo'limga saqlandi!");
       Navigator.of(context).pushReplacementNamed(HomePage.id);
     } else if(response.containsKey('error')) {
       List errors = HttpAuth.errorMessage(response['error']);
@@ -68,12 +73,7 @@ class _CreateAccountState extends State<CreateAccount> {
         isLoading = false;
       });
 
-      DialogUtils.dialogShow(
-        title: "Iltimos e'tibor bering!",
-        context: context,
-        content: text,
-        button: "Qaytadan urinish",
-      );
+      MsgUtil.fireToast(text);
     } else {
 
       setState(() {
@@ -110,7 +110,7 @@ class _CreateAccountState extends State<CreateAccount> {
       setState(() {
         isLoading = false;
       });
-      DialogUtils.dialogShow(title: 'Diqqat!', context: context, content: "Iltimos barchmaydonlarni to'ldiring", button: "Yopish");
+      MsgUtil.fireToast("Iltimos barchmaydonlarni to'ldiring");
     }
   }
 
@@ -289,30 +289,32 @@ class _CreateAccountState extends State<CreateAccount> {
 
                   // #gender
                   Container(
+                    height: 65,
                     decoration: BoxDecoration(
                       border: Border(bottom: BorderSide(color: Colors.green),)
                     ),
-                    child: ExpansionTile(
-                        title: new Text(gender),
-                        children: <Widget>[
-                          new ListTile(
-                            title: const Text('Erkak'),
-                            onTap: () {
-                              setState(() {
-                                gender = 'Erkak';
-                              });
-                            },
-                          ),
-                          new ListTile(
-                            title: const Text('Ayol'),
-                            onTap: () {
-                              setState(() {
-                                gender = 'Ayol';
-                              });
-                            },
-                          ),
-
-                        ]
+                    child: DropdownButtonFormField(
+                      style: TextStyle(color: Colors.black, fontSize: 18),
+                      elevation: 2,
+                      decoration: InputDecoration(
+                          border: InputBorder.none,
+                          filled: true,
+                          hintStyle: TextStyle(color: Colors.grey,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w300),
+                          hintText: "Jinsingiz",
+                        fillColor: Colors.transparent
+                      ),
+                      value: gender,
+                      onChanged: (String value) {
+                        setState(() {
+                          gender = value;
+                        });
+                      },
+                      items: genderList
+                          .map((_gender) => DropdownMenuItem(
+                          value: _gender, child: Text("$_gender", style: TextStyle(color: Colors.black, fontSize: 18),)))
+                          .toList(),
                     ),
                   ),
                   SizedBox(

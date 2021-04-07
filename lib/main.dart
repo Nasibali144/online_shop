@@ -27,11 +27,13 @@ import 'package:online_shop/pages/intro/splash_page.dart';
 import 'package:online_shop/pages/payment_delivery/table_delivery_page.dart';
 import 'package:online_shop/pages/product/viewed_products_page.dart';
 import 'package:online_shop/pages/test_page.dart';
+import 'package:online_shop/services/pref_service.dart';
 import 'package:provider/provider.dart';
-
 import 'models/account/user_data.dart';
 
-void main() {
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Pref.getInstance();
   runApp(MyApp());
 }
 
@@ -45,8 +47,8 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        //home: SplashPage(),
-        home: DetailPage(),
+        home: SplashPage(),
+        //home: CreateAccount(),
         routes: {
           HomePage.id: (context) => HomePage(),
           IntroPage.id: (context) => IntroPage(),

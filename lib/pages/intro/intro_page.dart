@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:online_shop/pages/authentication/create_registration_page.dart';
 import 'package:online_shop/pages/authentication/registration_with_phone.dart';
+import 'package:online_shop/services/manage_route.dart';
+import 'package:online_shop/services/pref_service.dart';
 import 'package:online_shop/utils/strings.dart';
 
 class IntroPage extends StatefulWidget {
@@ -33,7 +35,6 @@ class _IntroPageState extends State<IntroPage> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-
           // Til tanlash bu hozircha emas keyinroq qo'shiladi.
           /*Container(
             alignment: Alignment.centerRight,
@@ -98,9 +99,14 @@ class _IntroPageState extends State<IntroPage> {
                             "O'TKAZIB YUBORISH",
                             style: TextStyle(color: Colors.black, fontSize: 16),
                           ),
-                    onTap: () {
-                            Navigator.pushReplacementNamed(context, CreateRegistrationPage.id);
-                    },
+                          onTap: () {
+                            // #route_manage
+                            Pref.storeAuthStatus(AuthStatus.NOT_DETERMINED);
+                            print(
+                                "Intro Page: Auth Status Store => and load it: ${Pref.loadAuthStatus()}");
+                            Navigator.pushReplacementNamed(
+                                context, CreateRegistrationPage.id);
+                          },
                         )
                       : SizedBox.shrink(),
                 ),
@@ -119,7 +125,9 @@ class _IntroPageState extends State<IntroPage> {
                           onPressed: () {
                             setState(() {
                               currentIndex++;
-                              _pageController.nextPage(duration: Duration(milliseconds: 500), curve: Curves.ease);
+                              _pageController.nextPage(
+                                  duration: Duration(milliseconds: 500),
+                                  curve: Curves.ease);
                             });
                             // Sign in pagega o'tadi
                           },
@@ -131,6 +139,10 @@ class _IntroPageState extends State<IntroPage> {
                             textAlign: TextAlign.right,
                           ),
                           onTap: () {
+                            // #manage_route
+                            Pref.storeAuthStatus(AuthStatus.NOT_DETERMINED);
+                            print(
+                                "Intro Page: Auth Status Store => and load it: ${Pref.loadAuthStatus()}");
                             Navigator.pushReplacementNamed(
                                 context, CreateRegistrationPage.id);
                           },

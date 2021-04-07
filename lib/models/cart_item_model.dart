@@ -1,27 +1,40 @@
 class CartItem {
+  int id;
+  int quantity;
+  int price;
+  String createdAt;
   int cart;
   int product;
-  int quantity;
-  String createdAt;
 
-  CartItem({this.cart, this.product, this.quantity, this.createdAt});
+  CartItem(
+      {this.id,
+        this.quantity,
+        this.price,
+        this.createdAt,
+        this.cart,
+        this.product});
 
   CartItem.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    quantity = json['quantity'];
+    price = json['price'];
+    createdAt = json['created_at'];
     cart = json['cart'];
     product = json['product'];
-    quantity = json['quantity'];
-    createdAt = json['created_at'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['quantity'] = this.quantity;
+    data['price'] = this.price;
+    data['created_at'] = this.createdAt;
     data['cart'] = this.cart;
     data['product'] = this.product;
-    data['quantity'] = this.quantity;
-    data['created_at'] = this.createdAt;
     return data;
   }
 }
+
 
 class CartItemList{
   List<CartItem> cartItems;

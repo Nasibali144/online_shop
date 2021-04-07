@@ -1,9 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:online_shop/models/product_model.dart';
 import 'package:online_shop/pages/product/detail_page.dart';
+import 'package:online_shop/services/http_service.dart';
 
 class ProductCard extends StatefulWidget {
+
+  final int id;
+  ProductCard({this.id});
 
   @override
   _ProductCardState createState() => _ProductCardState();
@@ -11,6 +16,27 @@ class ProductCard extends StatefulWidget {
 
 class _ProductCardState extends State<ProductCard> {
   bool counter = false;
+  Product product;
+
+  @override
+  void initState() {
+        super.initState();
+        _getApiProduct();
+  }
+
+  _getApiProduct() {
+    Network.GET(Network.API_PRODUCT + "${widget.id}/", Network.paramEmpty())
+        .then((response) => {_checkResponseProduct(response)});
+  }
+
+  _checkResponseProduct(String response) {
+    if (response != null) {
+      setState(() {
+        product = Network.parseOneProduct(response);
+      });
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +57,7 @@ class _ProductCardState extends State<ProductCard> {
                   width: 140,
                   decoration: BoxDecoration(
                       image: DecorationImage(
-                        image: AssetImage('assets/images/product/product_1.png'),
+                        image: NetworkImage(product.image),
                       )
                   ),
                   alignment: Alignment.topCenter,
@@ -45,15 +71,16 @@ class _ProductCardState extends State<ProductCard> {
                     child: Text("-12 %", style: TextStyle(color: Colors.white),),
                   ),
                 ),
-                SizedBox(height: 10,),
+                SizedBox(height: 5,),
+                Text(product.name, style: TextStyle(fontWeight: FontWeight.w400),),
+                SizedBox(height: 5,),
                 Row(
                   children: [
-                    Text('Price: 5000 ', style: TextStyle(color: Colors.green, fontSize: 16),),
+                    Expanded(child: Text('Price: ${product.price} ', style: TextStyle(color: Colors.green, fontSize: 16),)),
                     Text("so'm", style: TextStyle(color: Colors.grey, fontSize: 14),)
                   ],
                 ),
                 SizedBox(height: 10,),
-                Text('Description: descr iption descri ption descri ption', style: TextStyle(fontWeight: FontWeight.w400),),
               ],
             ),
           ),

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:online_shop/models/account/user_data.dart';
 import 'package:online_shop/pages/address/address_list_page.dart';
@@ -8,6 +9,8 @@ import 'package:online_shop/pages/drawer/public_offer_page.dart';
 import 'package:online_shop/pages/product/favorite_products_page.dart';
 import 'package:online_shop/pages/product/viewed_products_page.dart';
 import 'package:online_shop/services/http_auth.dart';
+import 'package:online_shop/services/manage_route.dart';
+import 'package:online_shop/services/pref_service.dart';
 import 'package:provider/provider.dart';
 
 const DividerFor = Divider(
@@ -24,8 +27,22 @@ class DrawerTwo extends StatelessWidget {
       if(response.containsKey('success')) {
         Provider.of<UserData>(context, listen: false).removeUser();
         Provider.of<UserData>(context, listen: false).removeToken();
-        Navigator.pop(context);
+
+        //// for Auth Status
+        Pref.removeAuthStatus().then((value) {
+          if(value) {
+            Pref.storeAuthStatus(AuthStatus.NOT_LOGGED_IN);
+            print("Home Page: Auth Status Store => and load it: ${Pref.loadAuthStatus()}");
+          } else {
+            exit(0);
+          }
+        });
+
+        ////####xatolik bo'lishi mumkin pop da####
+        //Navigator.pop(context);
         Navigator.pushReplacementNamed(context, CreateRegistrationPage.id);
+      } else {
+        exit(0);
       }
     });
   }

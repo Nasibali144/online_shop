@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart';
 import 'package:online_shop/models/banner_model.dart';
+import 'package:online_shop/models/category_model.dart';
 import 'package:online_shop/models/product_model.dart';
 
 class Network{
@@ -11,6 +12,7 @@ class Network{
 
   static String API_BANNER = '/api/v1/banner/'; // {ID} GET
   static String API_PRODUCT = '/api/v1/product/'; //{ID} GET
+  static String API_CATEGORY = '/api/v1/category/'; //{ID} GET
 
 
   /* Http Requests */
@@ -91,6 +93,18 @@ class Network{
   static Product parseOneProduct(String body) {
     dynamic json = jsonDecode(utf8.decode(body.codeUnits));
     return Product.fromJson(json);
+  }
+
+  // FOR Category list
+  static CategoryList parseCategoryList(String body) {
+    dynamic json = jsonDecode(utf8.decode(body.codeUnits));
+    return CategoryList.fromJson(json);
+  }
+
+  // FOR One Category
+  static ProCategory parseOneCategory(String body) {
+    dynamic json = jsonDecode(utf8.decode(body.codeUnits));
+    return ProCategory.fromJson(json);
   }
 
   // FOR Banner

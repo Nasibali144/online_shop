@@ -2,9 +2,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:online_shop/models/account/user_data.dart';
 import 'package:online_shop/models/account/user_model.dart';
+import 'package:online_shop/pages/authentication/create_login_page.dart';
 import 'package:online_shop/pages/home_page.dart';
 import 'package:online_shop/services/http_auth.dart';
+import 'package:online_shop/services/manage_route.dart';
+import 'package:online_shop/services/pref_service.dart';
 import 'package:online_shop/utils/dialog_util.dart';
+import 'package:online_shop/utils/msg_util.dart';
 import 'package:provider/provider.dart';
 import 'create_account_page.dart';
 
@@ -26,6 +30,28 @@ class _CreateRegistrationPageState extends State<CreateRegistrationPage> {
   var password2Controller = TextEditingController();
 
 
+  _doRegistration() {
+    String username = usernameController.text.trim().toString();
+    String email = emailController.text.trim().toString();
+    String password1 = password1Controller.text.trim().toString();
+    String password2 = password2Controller.text.trim().toString();
+
+    setState(() {
+      isLoading = true;
+    });
+
+    if(password2 == password1 && username.isNotEmpty && email.isNotEmpty && password1.isNotEmpty) {
+      User _user = User(username: username, email: email, password: password1);
+      Provider.of<UserData>(context, listen: false).user = _user;
+      _apiCreate(_user);
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+      MsgUtil.fireToast("Iltimos barcha maydonlarni to'g'ri to'ldiring");
+    }
+  }
+
   void _apiCreate(User user) {
     HttpAuth.POST(HttpAuth.API_REGISTRATION_CREATE, HttpAuth.paramCreate(user), HttpAuth.headers).then((response) {
       print('Response my api:  $response');
@@ -44,6 +70,15 @@ class _CreateRegistrationPageState extends State<CreateRegistrationPage> {
         isLoading = false;
       });
 
+      //// for Auth Status
+      Pref.removeAuthStatus().then((value) {
+        if(value) {
+         Pref.storeAuthStatus(AuthStatus.LOGGED_IN);
+         print("Create Registration Page: Auth Status Store => and load it: ${Pref.loadAuthStatus()}");
+        } else {
+          exit(0);
+        }
+      });
       ////### bag###
       Navigator.of(context).pushReplacement(MaterialPageRoute(
           builder: (context) => CreateAccount()
@@ -60,12 +95,7 @@ class _CreateRegistrationPageState extends State<CreateRegistrationPage> {
         isLoading = false;
       });
 
-      DialogUtils.dialogShow(
-        title: "Iltimos e'tibor bering!",
-        context: context,
-        content: text,
-        button: "Qaytadan urinish",
-      );
+      MsgUtil.fireToast(text);
     } else {
       setState(() {
         isLoading = false;
@@ -77,28 +107,6 @@ class _CreateRegistrationPageState extends State<CreateRegistrationPage> {
         button: 'Dasturdan chiqish',
       );
       exit(0);
-    }
-  }
-
-  _doRegistration() {
-    String username = usernameController.text.trim().toString();
-    String email = emailController.text.trim().toString();
-    String password1 = password1Controller.text.trim().toString();
-    String password2 = password1Controller.text.trim().toString();
-
-    setState(() {
-      isLoading = true;
-    });
-
-    if(username.isNotEmpty && email.isNotEmpty && password1.isNotEmpty && (password2 == password1)) {
-      User _user = User(username: username, email: email, password: password1);
-      Provider.of<UserData>(context, listen: false).user = _user;
-      _apiCreate(_user);
-    } else {
-      setState(() {
-        isLoading = false;
-      });
-      DialogUtils.dialogShow(title: 'Diqqat!', context: context, content: "Iltimos barcha maydonlarni to'ldiring", button: "Yopish");
     }
   }
 
@@ -129,11 +137,11 @@ class _CreateRegistrationPageState extends State<CreateRegistrationPage> {
             SingleChildScrollView(
               child: Column(
                 children: [
-                  // #ism
+
+                  // #username
                   TextField(
                     controller: usernameController,
                     cursorColor: Colors.green,
-                    autofocus: true,
                     decoration: InputDecoration(
                       labelText: "Foydalanuvchi nomi",
                       labelStyle: TextStyle(
@@ -154,10 +162,10 @@ class _CreateRegistrationPageState extends State<CreateRegistrationPage> {
                     height: 10,
                   ),
 
+                  // #email
                   TextField(
                     controller: emailController,
                     cursorColor: Colors.green,
-                    autofocus: true,
                     decoration: InputDecoration(
                       labelText: "Emailingizni kiriting",
                       labelStyle: TextStyle(
@@ -172,16 +180,17 @@ class _CreateRegistrationPageState extends State<CreateRegistrationPage> {
                       ),
                     ),
                     style: TextStyle(color: Colors.black, fontSize: 18),
-                    keyboardType: TextInputType.name,
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                  SizedBox(
+                    height: 10,
                   ),
 
-                  SizedBox(
-                    height: 20,
-                  ),
+                  // #password
                   TextField(
                     controller: password1Controller,
                     cursorColor: Colors.green,
-                    autofocus: true,
+                    obscureText: true,
                     decoration: InputDecoration(
                       labelText: "Parolingizni kiriting",
                       labelStyle: TextStyle(
@@ -196,19 +205,18 @@ class _CreateRegistrationPageState extends State<CreateRegistrationPage> {
                       ),
                     ),
                     style: TextStyle(color: Colors.black, fontSize: 18),
-                    keyboardType: TextInputType.name,
+                    keyboardType: TextInputType.visiblePassword,
                   ),
-
-                  // # nomer
-
                   SizedBox(
                     height: 10,
                   ),
-                  // #email
+
+
+                  // #confirm password
                   TextField(
                     controller: password2Controller,
                     cursorColor: Colors.green,
-                    autofocus: true,
+                    obscureText: true,
                     decoration: InputDecoration(
                       labelText: "Parolingizni tasdiqlang",
                       labelStyle: TextStyle(
@@ -223,7 +231,7 @@ class _CreateRegistrationPageState extends State<CreateRegistrationPage> {
                       ),
                     ),
                     style: TextStyle(color: Colors.black, fontSize: 18),
-                    keyboardType: TextInputType.emailAddress,
+                    keyboardType: TextInputType.visiblePassword,
                   ),
                   SizedBox(
                     height: 25,
@@ -243,6 +251,21 @@ class _CreateRegistrationPageState extends State<CreateRegistrationPage> {
                         style: TextStyle(fontSize: 18),
                       ),
                       onPressed: _doRegistration,
+                    ),
+                  ),
+                  SizedBox(height: 30,),
+
+                  // #navigate
+                  InkWell(
+                    onTap: () {
+                      Navigator.pushReplacementNamed(context, CreateLoginPage.id);
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("Allaqachon ro'yxatdan o'tganmisiz? ",),
+                        Text("Tizimga kirish", style: TextStyle( color: Colors.blue),)
+                      ],
                     ),
                   ),
                 ],

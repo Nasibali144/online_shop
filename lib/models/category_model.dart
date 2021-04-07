@@ -1,29 +1,39 @@
 class CategoryList{
-  List<Category> categories;
+  List<ProCategory> categories;
 
   CategoryList.fromJson(List<dynamic> json)
-  : categories = List<Category>.from(json.map((x) => Category.fromJson(x)));
+  : categories = List<ProCategory>.from(json.map((x) => ProCategory.fromJson(x)));
 
   List<dynamic> toJson() => [
-    List<Category>.from(categories.map((x) => x.toJson()))
+    List<ProCategory>.from(categories.map((x) => x.toJson()))
   ];
 }
 
-class Category {
+class ProCategory {
   int id;
   String name;
+  List<ProCategory> children;
 
-  Category({this.id, this.name});
+  ProCategory({this.id, this.name, this.children});
 
-  Category.fromJson(Map<String, dynamic> json) {
+  ProCategory.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
+    if (json['children'] != null) {
+      children = new List<ProCategory>();
+      json['children'].forEach((v) {
+        children.add(new ProCategory.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
     data['name'] = this.name;
+    if (this.children != null) {
+      data['children'] = this.children.map((v) => v.toJson()).toList();
+    }
     return data;
   }
 }

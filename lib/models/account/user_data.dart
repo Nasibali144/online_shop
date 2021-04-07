@@ -75,7 +75,7 @@ class UserData with ChangeNotifier {
   void loadUser() {
     Pref.loadUser().then((myUser) {
       print('USER DATA WORK: STORE USER=> USERDATA DAGI: username: ${_user.username}, phone${_user.phone_number}, PREF DAGI: username: ${myUser.username}, phone${myUser.phone_number}');
-      if(user.id != myUser.id) {
+      if(user.id != myUser.id){
         _user = myUser;
       }
       notifyListeners();

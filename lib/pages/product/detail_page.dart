@@ -1,24 +1,47 @@
 import 'package:flutter/material.dart';
+import 'package:online_shop/models/product_model.dart';
 import 'package:online_shop/pages/product/cart_page.dart';
+import 'package:online_shop/services/http_service.dart';
 import 'package:online_shop/widgets/product_cart%20_widget.dart';
 import 'package:online_shop/widgets/product_category_widget.dart';
 import 'package:online_shop/widgets/slider_widget.dart';
 
-class DetailPage extends StatelessWidget {
+class DetailPage extends StatefulWidget {
 
   static final String id = 'detail_page';
 
+  @override
+  _DetailPageState createState() => _DetailPageState();
+}
+
+class _DetailPageState extends State<DetailPage> {
   List<String> productImage = [
     'assets/images/product/product_2.jpg',
     'assets/images/product/product_3.webp',
   ];
 
-  List<Widget> productCarts = [
-    ProductCard(),
-    ProductCard(),
-    ProductCard(),
-    ProductCard(),
-  ];
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _getApiProductList();
+  }
+
+  //////// product
+  List<Product> _products = new List();
+
+  _getApiProductList() {
+    Network.GET(Network.API_PRODUCT, Network.paramEmpty())
+        .then((response) => {_checkResponseProduct(response)});
+  }
+
+  _checkResponseProduct(String response) {
+    if (response != null) {
+      setState(() {
+        _products = Network.parseProList(response).products;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -162,7 +185,8 @@ class DetailPage extends StatelessWidget {
                     ),
                   ]
               ),
-                child: ProductCategoryWidget(productCarts: productCarts, categoryTheme: "O'xshash mahsulotlar",),),
+                //child: ProductCategoryWidget(productCarts: productCarts, categoryTheme: "O'xshash mahsulotlar",)
+              ),
           ],
         ),
       ),
