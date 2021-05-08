@@ -11,72 +11,66 @@ class ChosePayment extends StatefulWidget {
 }
 
 class _ChosePaymentState extends State<ChosePayment> {
+
+  bool isChoiceMoney = false;
+  bool isChoiceBankCard = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         elevation: 1,
         backgroundColor: Colors.white,
-        leading: Icon(Icons.arrow_back, color: Colors.black),
-        title: Text('Tolov  usulini tanlang',
+        leading: IconButton(icon: Icon(Icons.arrow_back, color: Colors.black), onPressed: () => Navigator.pop(context),),
+        title: Text("To'lov  usulini tanlang",
             style: TextStyle(color: Colors.black)),
       ),
       body: Column(children: [
         Expanded(
           child: Column(
             children: [
-              GestureDetector(
-                child: Container(
-                    color: Colors.white,
-                    width: double.infinity,
-                    child: ListTile(
-                      leading: Icon(
-                        Icons.payments,
-                        color: Colors.yellow,
-                      ),
-                      title: Text('Naqd Pulda'),
-                    )),
+              ListTile(
+                tileColor: Colors.white,
                 onTap: () {
-                  Navigator.pushNamed(context, ApproveOrder.id);
+                  setState(() {
+                    isChoiceBankCard = false;
+                    isChoiceMoney = true;
+                  });
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => ApproveOrder(msg: "Naqd Pulda",)));
                 },
+                leading: Icon(
+                  Icons.payments,
+                  color: Colors.yellow,
+                ),
+                title: Text('Naqd Pulda'),
+                trailing: isChoiceMoney ? Icon(
+                  Icons.check,
+                  color: Colors.green,
+                ) : null,
               ),
               Divider(
                 height: 2,
               ),
-              GestureDetector(
+              ListTile(
                 onTap: () {
+                  setState(() {
+                    isChoiceBankCard = true;
+                    isChoiceMoney = false;
+                  });
                   Navigator.pushNamed(context, CardTypes.id);
                 },
-                child: Container(
-                  child: ListTile(
-                    leading: Icon(Icons.credit_card, color: Colors.blue),
-                    title: Text('Bank Kartasi'),
-                    subtitle: Text('Uzcard : 860012******0052'),
-                    trailing: Icon(
-                      Icons.check,
-                      color: Colors.green,
-                    ),
-                  ),
-                  color: Colors.white,
-                  width: double.infinity,
-                ),
+                tileColor: Colors.white,
+                leading: Icon(Icons.credit_card, color: Colors.blue),
+                title: Text('Bank Kartasi'),
+                trailing: isChoiceBankCard ? Icon(
+                  Icons.check,
+                  color: Colors.green,
+                ) : null,
               ),
             ],
           ),
         ),
-        // Container(
-        //   margin: EdgeInsets.all(10),
-        //   width: MediaQuery.of(context).size.width,
-        //   child: RaisedButton(
-        //     child: Text(
-        //       'Davom etish',
-        //       style: TextStyle(fontSize: 15),
-        //     ),
-        //     color: Colors.green,
-        //     onPressed: () {},
-        //   ),
-        // ),
-      ]),
+      ],),
     );
   }
 }

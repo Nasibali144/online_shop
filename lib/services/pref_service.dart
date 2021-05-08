@@ -80,21 +80,21 @@ class Pref{
     return prefs.remove("token");
   }
 
-  // for auth
-  // static storeAuthStatus(AuthStatus status) async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   prefs.setString("status", ManageNavigation.getStatus(status));
-  // }
+  // for Cart id
+  static storeCartId(int id) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setInt('id', id);
+  }
 
-  // static Future<String> loadAuthStatus() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   return prefs.getString("status");
-  // }
+  static Future<int> loadCartId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('id');
+  }
 
-  // static Future<bool> removeAuthStatus() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   return prefs.remove("status");
-  // }
+  static Future<bool> removeCartId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.remove("id");
+  }
 
   // for user
   static storeUser(User user) async {

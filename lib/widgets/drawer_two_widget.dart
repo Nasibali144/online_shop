@@ -7,6 +7,7 @@ import 'package:online_shop/pages/authentication/create_registration_page.dart';
 import 'package:online_shop/pages/drawer/answer_question_page.dart';
 import 'package:online_shop/pages/drawer/public_offer_page.dart';
 import 'package:online_shop/pages/product/favorite_products_page.dart';
+import 'package:online_shop/pages/product/products_catalogs_page.dart';
 import 'package:online_shop/pages/product/viewed_products_page.dart';
 import 'package:online_shop/services/http_auth.dart';
 import 'package:online_shop/services/manage_route.dart';
@@ -63,120 +64,105 @@ class DrawerTwo extends StatelessWidget {
                   )),
             ),
           ),
+          // Container(
+          //   color: Colors.white,
+          //   child: ListTile(
+          //     leading: Icon(
+          //       Icons.location_on,
+          //       color: Colors.red,
+          //     ),
+          //     title: Text('Kompaniyani ozgartirish'),
+          //   ),
+          // ),
+          // DividerFor,
+          Container(
+            color: Colors.white,
+            child: ListTile(
+              onTap: () {
+                Navigator.pushNamed(context, ProductsCatalogue.id);
+              },
+              leading: Icon(
+                Icons.menu,
+                color: Colors.blue.shade300,
+              ),
+              title: Text('Maxsulotlar Katalogi'),
+            ),
+          ),
+          SizedBox(height: 15),
           Container(
             color: Colors.white,
             child: ListTile(
               leading: Icon(
-                Icons.location_on,
-                color: Colors.red,
+                Icons.attach_money,
+                color: Colors.yellow,
               ),
-              title: Text('Kompaniyani ozgartirish'),
-            ),
-          ),
-          DividerFor,
-          GestureDetector(
-            onTap: () {},
-            child: Container(
-              color: Colors.white,
-              child: ListTile(
-                leading: Icon(
-                  Icons.menu,
-                  color: Colors.blue.shade300,
-                ),
-                title: Text('Mxsulotlar Katalogi'),
-              ),
-            ),
-          ),
-          SizedBox(height: 15),
-          GestureDetector(
-            child: Container(
-              color: Colors.white,
-              child: ListTile(
-                leading: Icon(
-                  Icons.attach_money,
-                  color: Colors.yellow,
-                ),
-                title: Text('Hamyon'),
-              ),
+              title: Text('Hamyon'),
             ),
           ),
           SizedBox(
             height: 15,
           ),
-          GestureDetector(
-            child: Container(
-              color: Colors.white,
-              child: ListTile(
-                leading: Icon(
-                  Icons.card_travel,
-                  color: Colors.brown,
-                ),
-                title: Text('Buyurtmalarim Royxati'),
+          Container(
+            color: Colors.white,
+            child: ListTile(
+              leading: Icon(
+                Icons.card_travel,
+                color: Colors.brown,
               ),
+              title: Text('Buyurtmalarim Royxati'),
             ),
           ),
           DividerFor,
-          GestureDetector(
-            onTap: () {
-              Navigator.pushReplacementNamed(context, AddressListPage.id);
-            },
-            child: Container(
-              color: Colors.white,
-              child: ListTile(
-                leading: Icon(
-                  Icons.alternate_email,
-                  color: Colors.purple,
-                ),
-                title: Text('Manzillarim Royxati'),
+          Container(
+            color: Colors.white,
+            child: ListTile(
+              onTap: () {
+                Navigator.pushReplacementNamed(context, AddressListPage.id);
+              },
+              leading: Icon(
+                Icons.alternate_email,
+                color: Colors.purple,
               ),
+              title: Text('Manzillarim Royxati'),
             ),
           ),
           DividerFor,
-          GestureDetector(
-            onTap: () {
-              //Navigator.pushReplacementNamed(context, routeName);
-            },
-            child: Container(
-              color: Colors.white,
-              child: ListTile(
-                leading: Icon(
-                  Icons.credit_card_outlined,
-                  color: Colors.blue,
-                ),
-                title: Text('Tolov kartalari'),
+          Container(
+            color: Colors.white,
+            child: ListTile(
+              leading: Icon(
+                Icons.credit_card_outlined,
+                color: Colors.blue,
               ),
+              title: Text('Tolov kartalari'),
             ),
           ),
-          GestureDetector(
-            onTap: () {
-              Navigator.pushReplacementNamed(context, FavoriteProductsPage.id);
-            },
-            child: Container(
-              color: Colors.white,
-              child: ListTile(
-                leading: Icon(
-                  Icons.star_border,
-                  color: Colors.yellow,
-                ),
-                title: Text('Sevimli mahsulotlarim'),
+          Container(
+            color: Colors.white,
+            child: ListTile(
+              onTap: () {
+                Navigator.pushReplacementNamed(context, FavoriteProductsPage.id);
+              },
+              leading: Icon(
+                Icons.star_border,
+                color: Colors.yellow,
               ),
+              title: Text('Sevimli mahsulotlarim'),
             ),
           ),
           DividerFor,
-          GestureDetector(
-            onTap: () {
-              Navigator.pushNamed(context, ViewedProductPage.id);
-              //Navigator.pop(context);
-            },
-            child: Container(
-              color: Colors.white,
-              child: ListTile(
-                leading: Icon(
-                  Icons.remove_red_eye,
-                  color: Colors.teal,
-                ),
-                title: Text('Korilgan mahsulotlari'),
+          Container(
+            color: Colors.white,
+            child: ListTile(
+              onTap: () {
+                Navigator.pushNamed(context, ViewedProductPage.id);
+                //Navigator.pop(context);
+              },
+              leading: Icon(
+                Icons.remove_red_eye,
+                color: Colors.teal,
               ),
+              title: Text('Korilgan mahsulotlari'),
             ),
           ),
           SizedBox(height: 15),

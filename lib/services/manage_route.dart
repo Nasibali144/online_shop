@@ -42,6 +42,9 @@ class ManageNavigation with ChangeNotifier{
       case "LOGGED_IN":
         Navigator.pushReplacementNamed(context, HomePage.id);
         break;
+      default:
+        Navigator.pushReplacementNamed(context, IntroPage.id);
+        break;
     }
   }
 
@@ -49,7 +52,9 @@ class ManageNavigation with ChangeNotifier{
     try{
       String status = Pref.loadAuthStatus();
       print("Status Auth: =>.....$status");
-      if(status != null) {
+      if(status == "NO DATA IN STATUS DATABASE") {
+        Navigator.pushReplacementNamed(context, IntroPage.id);
+      } else if(status != null) {
         getRouteId(context, status);
       } else {
         Navigator.pushReplacementNamed(context, IntroPage.id);

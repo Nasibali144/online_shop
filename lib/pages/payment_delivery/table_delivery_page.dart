@@ -2,16 +2,33 @@ import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:online_shop/models/order_model.dart';
 import 'package:online_shop/pages/payment_delivery/choose_payment_page.dart';
-
-import 'delivery_type_page.dart';
-
+import 'package:online_shop/utils/msg_util.dart';
+import 'package:provider/provider.dart';
 
 class TableDeliveryPage extends StatelessWidget {
   static final String id = "table_delivery_page";
 
   final format1 = DateFormat("yyyy-MM-dd");
   final format2 = DateFormat("HH:mm");
+
+  var dayController = TextEditingController();
+  var hourController = TextEditingController();
+
+  _getTime(BuildContext context) {
+    String day = dayController.text.trim().toString();
+    String hour = hourController.text.trim().toString();
+
+   if(day.isNotEmpty && hour.isNotEmpty) {
+     String date = day + ' ' + hour;
+     Provider.of<Orders>(context,  listen: false).dateTime = DateTime.parse(date);
+     print(Provider.of<Orders>(context, listen: false).dateTime.toString());
+     Navigator.pushNamed(context, ChosePayment.id);
+   } else {
+     MsgUtil.fireToast("Iltimos vaqtni kiriting!");
+   }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +40,7 @@ class TableDeliveryPage extends StatelessWidget {
             color: Colors.black,
           ),
           onPressed: () {
-            Navigator.pushReplacementNamed(context, DeliveryType.id);
+            Navigator.pop(context);
           },
         ),
         title: Text(
@@ -39,6 +56,7 @@ class TableDeliveryPage extends StatelessWidget {
           // #kun
           Text('Yetkazib berish sanasini kiriting:', style: TextStyle(fontSize: 20, color: Colors.black),),
           DateTimeField(
+            controller: dayController,
             decoration: InputDecoration(
               labelText: "Yil, oy, kun",
               labelStyle: TextStyle(fontSize: 17, color: Colors.green),
@@ -63,6 +81,7 @@ class TableDeliveryPage extends StatelessWidget {
           SizedBox(height: 30,),
           Text('Yetkazib berish vaqtini kiriting:', style: TextStyle(fontSize: 20, color: Colors.black),),
           DateTimeField(
+            controller: hourController,
             format: format2,
             decoration: InputDecoration(
               labelText: "Soat : minut",
@@ -96,7 +115,7 @@ class TableDeliveryPage extends StatelessWidget {
               textColor: Colors.white,
               child: Text('DAVOM ETTIRISH', style: TextStyle(fontSize: 18),),
               onPressed: () {
-                Navigator.pushNamed(context, ChosePayment.id);
+                _getTime(context);
               },
             ),
           ),

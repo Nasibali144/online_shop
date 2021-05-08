@@ -96,7 +96,7 @@ class _SliderWidgetState extends State<SliderWidget> {
                   child: ClipRRect(
                       borderRadius: BorderRadius.circular(5),
                       child: Image(
-                        image: AssetImage(item),
+                        image: NetworkImage(item),
                         //fit: BoxFit.cover,
                       )
                   ),

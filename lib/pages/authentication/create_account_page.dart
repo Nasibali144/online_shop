@@ -8,6 +8,7 @@ import 'package:online_shop/models/account/user_model.dart';
 import 'package:online_shop/pages/home_page.dart';
 import 'package:online_shop/services/http_auth.dart';
 import 'package:online_shop/services/http_cart.dart';
+import 'package:online_shop/services/pref_service.dart';
 import 'package:online_shop/utils/dialog_util.dart';
 import 'package:online_shop/utils/msg_util.dart';
 import 'package:provider/provider.dart';
@@ -55,8 +56,11 @@ class _CreateAccountState extends State<CreateAccount> {
       setState(() {
         isLoading = false;
       });
-      HttpCart.POST(HttpCart.BASE, HttpCart.paramEmpty(), HttpCart.headersWithToken(context)).then((value) {
-        print(value);
+      HttpCart.POST(HttpCart.API_CART_CREATE, HttpCart.paramEmpty(), HttpCart.headersWithToken(context)).then((response) {
+        print("Create Cart: $response");
+        int id = HttpCart.parseCart(response).id;
+        print("Create CartId: $id");
+        Pref.storeCartId(id);
       });
 
       MsgUtil.fireToast("Ma'lumotlaringiz 'Mening profilim' bo'limga saqlandi!");

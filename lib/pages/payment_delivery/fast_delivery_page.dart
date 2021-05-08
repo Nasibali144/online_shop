@@ -1,9 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:online_shop/models/order_model.dart';
 import 'package:online_shop/pages/payment_delivery/choose_payment_page.dart';
 import 'package:online_shop/pages/payment_delivery/delivery_type_page.dart';
+import 'package:online_shop/utils/msg_util.dart';
 import 'package:online_shop/utils/time_utils.dart';
+import 'package:provider/provider.dart';
 
 class FastDeliveryPage extends StatefulWidget {
 
@@ -23,6 +26,21 @@ class _FastDeliveryPageState extends State<FastDeliveryPage> {
     dateTime = getDateTime();
   }
 
+  // vaqtni to'g'ri belgilashi kerak bu qilingan ish chala
+
+  _getDateTime() {
+    final value = DateFormat('HH:mm').format(dateTime);
+    Utils.showSnackBar(context, 'Selected "$value"');
+
+    if(DateFormat('HH:mm').format(dateTime) != DateFormat('HH:mm').format(DateTime.now())) {
+      Provider.of<Orders>(context,  listen: false).dateTime = dateTime;
+      print(Provider.of<Orders>(context, listen: false).dateTime.toString());
+      Navigator.pushNamed(context, ChosePayment.id);
+    } else {
+      MsgUtil.fireToast("Iltimos vaqtni kiriting");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,7 +51,7 @@ class _FastDeliveryPageState extends State<FastDeliveryPage> {
             color: Colors.black,
           ),
           onPressed: () {
-            Navigator.pushReplacementNamed(context, DeliveryType.id);
+            Navigator.pop(context);
           },
         ),
         title: Text(
@@ -61,11 +79,7 @@ class _FastDeliveryPageState extends State<FastDeliveryPage> {
             child: FlatButton(
               textColor: Colors.white,
               child: Text('Davom ettirish', style: TextStyle(fontSize: 18),),
-              onPressed: () {
-                final value = DateFormat('HH:mm').format(dateTime);
-                Utils.showSnackBar(context, 'Selected "$value"');
-                Navigator.pushReplacementNamed(context, ChosePayment.id);
-              },
+              onPressed: _getDateTime,
             ),
           ),
         ],
@@ -87,7 +101,6 @@ class _FastDeliveryPageState extends State<FastDeliveryPage> {
 
   DateTime getDateTime() {
     final now = DateTime.now();
-
     return DateTime(now.year, now.month, now.day, now.hour, 0);
   }
 }

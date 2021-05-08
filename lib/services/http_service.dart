@@ -24,6 +24,7 @@ class Network{
       print("Response: ${response.body.toString()}");
       return response.body;
     }
+    print(response.statusCode.toString());
     return null;
   }
 

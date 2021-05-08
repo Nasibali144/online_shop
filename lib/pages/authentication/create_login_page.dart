@@ -79,7 +79,7 @@ class CreateLoginPage extends StatelessWidget {
     String email = emailController.text.trim().toString();
     String password = passwordController.text.trim().toString();
 
-    Provider.of<UserData>(context, listen: false).loadingProgress();
+      Provider.of<UserData>(context, listen: false).loadingProgress();
 
     if(username.isNotEmpty && email.isNotEmpty && password.isNotEmpty) {
       User _user = User(username: username, email: email, password: password);

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:online_shop/pages/home_page.dart';
 
-import '../../widgets/cart_cuonter_page.dart';
+import '../../widgets/cart_cuonter_widget.dart';
 
 class FavoriteProductsPage extends StatefulWidget {
 
@@ -118,7 +118,7 @@ class _FavoriteProductsPageState extends State<FavoriteProductsPage> {
                             width: double.infinity,
                             padding: EdgeInsets.only(left: 10, top: 10),
                             alignment: Alignment.centerLeft,
-                            child: CartCounter(),
+                            child: CartCounter.cartCounterForListVertical(),
                           )
                         ],
                       ),
@@ -191,7 +191,7 @@ class _FavoriteProductsPageState extends State<FavoriteProductsPage> {
                             width: double.infinity,
                             padding: EdgeInsets.only(left: 10, top: 10),
                             alignment: Alignment.centerLeft,
-                            child: CartCounter(),
+                            child: CartCounter.cartCounterForListVertical(),
                           )
                         ],
                       ),

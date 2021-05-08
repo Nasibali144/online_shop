@@ -2,15 +2,17 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:online_shop/models/banner_model.dart';
-import 'package:online_shop/models/category_model.dart';
+import 'package:online_shop/models/cart_item_model.dart';
 import 'package:online_shop/models/product_model.dart';
 import 'package:online_shop/pages/product/cart_page.dart';
 import 'package:online_shop/pages/product/detail_page.dart';
 import 'package:online_shop/pages/product/product_list_page.dart';
 import 'package:online_shop/services/http_service.dart';
 import 'package:online_shop/services/pref_service.dart';
+import 'package:online_shop/widgets/badge_widget.dart';
 import 'package:online_shop/widgets/drawer_one_widget.dart';
 import 'package:online_shop/widgets/drawer_two_widget.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   static final String id = 'home_page';
@@ -26,9 +28,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _getApiProductList();
     _getBannerList();
-    _getApiCategoryList();
     print(Pref.loadAuthStatus());
     setState(() {
       authStatus = Pref.loadAuthStatus();
@@ -36,42 +36,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   bool isSearch = false;
-
-  List<Widget> productCarts = new List();
-
-  void _getProductsId() {
-    for (int i = 0; i < _products.length; i++) {
-      setState(() {
-        productCarts.add(_productCart(_products[i]));
-      });
-    }
-  }
-
-  List<String> categoryTexts = new List();
-
-  void _getCategoryName() {
-    for (int i = 0; i < _categories.length; i++) {
-      setState(() {
-        categoryTexts.add((_categories[i].name));
-      });
-    }
-  }
-
-
-  //////// product
-  List<Product> _products = new List();
-  _getApiProductList() {
-    Network.GET(Network.API_PRODUCT, Network.paramEmpty())
-        .then((response) => {_checkResponseProduct(response)});
-  }
-  _checkResponseProduct(String response) {
-    if (response != null) {
-      setState(() {
-        _products = Network.parseProList(response).products;
-      });
-    }
-    _getProductsId();
-  }
 
   //////// banner
   List<String> imagesReklama = new List();
@@ -89,24 +53,51 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  //// product and category
+  // serverdan data olib kelish
+  Map<String, List<Product>> categoryMap = new Map();
 
-  ///////// category
-  List<ProCategory> _categories = new List();
-  _getApiCategoryList() {
-    Network.GET(Network.API_CATEGORY, Network.paramEmpty())
-        .then((response) => {_checkResponseCategory(response)});
-  }
-  _checkResponseCategory(String response) {
-    if (response != null) {
-      setState(() {
-        _categories = Network.parseCategoryList(response).categories;
+  var _isInit = true;
+  @override
+  void didChangeDependencies() async {
+    if (_isInit) {
+      Provider.of<ProductList>(context, listen: false).loadingProgress();
+      await Provider.of<ProductList>(context, listen: false).getApiProductFirstList(context);
+      Future.delayed(Duration(seconds: 10), () {
+        setState(() {
+          categoryMap = Provider.of<ProductList>(context, listen: false).categoryMap;
+          print("HHHHHHHHHHH : ${categoryMap.toString()}");
+        });
+        Provider.of<ProductList>(context, listen: false).loadingProgress();
+
       });
     }
-    _getCategoryName();
+    setState(() {
+      _isInit = false;
+    });
+    super.didChangeDependencies();
+  }
+
+  // // refresh
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+  new GlobalKey<RefreshIndicatorState>();
+  Future<void> _refresh() async{
+    Provider.of<ProductList>(context, listen: false).loadingProgress();
+
+    await Provider.of<ProductList>(context, listen: false).getApiProductFirstList(context);
+    Future.delayed(const Duration(seconds: 7), () {
+      setState(() {
+        categoryMap = Provider.of<ProductList>(context, listen: false).categoryMap;
+        print("HHHHHHHHHHH : ${categoryMap.toString()}");
+      });
+      Provider.of<ProductList>(context, listen: false).loadingProgress();
+    });
+
   }
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: isSearch ? AppBar(
@@ -161,39 +152,48 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         actions: [
-          IconButton(
-            icon: Icon(
-              Icons.shopping_cart,
+          //Navigator.pushNamed(context, CartPage.id);
+          Consumer<CartItemList>(
+            builder: (context, cart, ch) => Badge(
+              child: ch,
+              value: cart.itemCount.toString(),
             ),
-            onPressed: () {
-              Navigator.pushNamed(context, CartPage.id);
-            },
-          )
+            child: IconButton(
+              icon: Icon(
+                Icons.shopping_cart,
+              ),
+              onPressed: () {
+                Navigator.pushNamed(context, CartPage.id);
+              },
+            ),
+          ),
         ],
       ),
 
       // ###drawer###
       // shu yerda xatolik berishi mumkin
       drawer: authStatus == "LOGGED_IN" ? DrawerTwo() : DrawerOne(),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // #reklama
-            _bannerWidget(),
-
-            //kategoriyalar
-            Column(
-              children: List<Widget>.from(categoryTexts.map(
-                    (text) => _categoryList(text),
-              )).toList(),
-            )
-          ],
+      body: Provider.of<ProductList>(context, listen: false).isLoading ? Center(
+        child: CircularProgressIndicator(),
+      ) :
+      RefreshIndicator(
+        key: _refreshIndicatorKey,
+        onRefresh: _refresh,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              // #reklama
+              _bannerWidget(),
+              //kategoriyalar
+              Column(
+                children: categoryMap.entries.map( (mapItem) => _categoryList(mapItem.key, mapItem.value)).toList(),
+              )
+            ],
+          ),
         ),
       ),
     );
   }
-
-
 
   Widget _bannerWidget() {
     print(MediaQuery.of(context).size.width);
@@ -212,7 +212,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _categoryList(String text) {
+  Widget _categoryList(String category, List<Product> product) {
     return Container(
       height: 320,
       margin: EdgeInsets.only(bottom: 20),
@@ -227,13 +227,14 @@ class _HomePageState extends State<HomePage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(text, style: TextStyle(fontSize: 16),),
+                Text(category, style: TextStyle(fontSize: 16),),
                 FlatButton(
                   height: 30,
                   color: Colors.green[50],
                   textColor: Colors.green,
                   onPressed: () {
-                    Navigator.pushReplacementNamed(context, ProductListPage.id);
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => ProductListPage(productList: product, name: category,)));
+                    //Navigator.pushReplacementNamed(context, ProductListPage.id);
                   },
                   child: Text('Barchasi',),
                 )
@@ -242,19 +243,185 @@ class _HomePageState extends State<HomePage> {
           ),
           Divider(),
           Expanded(
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: productCarts.length,
-              itemBuilder: (context, index) => productCarts[index],
+            child: ProductsListViewWidget(products: product,),
             ),
-          ),
         ],
       ),
     );
   }
 
-  bool counter = false;
-  Widget _productCart(Product product) {
+  // bool counter = false;
+  // Widget _productCart(Product product) {
+  //   return Container(
+  //     margin: EdgeInsets.only(left: 10, right: 10, bottom: 10),
+  //     width: 140,
+  //     child: Stack(
+  //       children: [
+  //         GestureDetector(
+  //           onTap: () {
+  //             Navigator.pushNamed(context, DetailPage.id);
+  //           },
+  //           child: Column(
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children: [
+  //               Container(
+  //                 height: 155,
+  //                 width: 140,
+  //                 decoration: BoxDecoration(
+  //                   image: DecorationImage(
+  //                     image: NetworkImage(product.image),
+  //                   ),
+  //                 ),
+  //                 alignment: Alignment.topLeft,
+  //                 child: Container(
+  //                   margin: EdgeInsets.only(left: 5, top: 5),
+  //                   alignment: Alignment.center,
+  //                   height: 20,
+  //                   width: 40,
+  //                   decoration: BoxDecoration(
+  //                       color: Colors.red
+  //                   ),
+  //                   child: Text("-12 %", style: TextStyle(color: Colors.white),),
+  //                 ),
+  //               ),
+  //               SizedBox(height: 5,),
+  //               Text("${product.name.length <= 36 ? product.name : product.name.substring(0, 36)}", style: TextStyle(fontWeight: FontWeight.w400),),
+  //               SizedBox(height: 5,),
+  //               Expanded(child: Text("Price: ${product.price} so'm", style: TextStyle(color: Colors.green, fontSize: 16),)),
+  //             ],
+  //           ),
+  //         ),
+  //
+  //         Align(
+  //           alignment: Alignment.topRight,
+  //           child: counter ? Container(
+  //             margin: EdgeInsets.all(5),
+  //             height: 40,
+  //             width: 120,
+  //             decoration: BoxDecoration(
+  //                 borderRadius: BorderRadius.circular(5),
+  //                 color: Colors.white,
+  //                 boxShadow: [
+  //                   BoxShadow(
+  //                       color: Colors.black.withOpacity(0.25),
+  //                       offset: new Offset(0.0, 0.0),
+  //                       blurRadius: 5.0,
+  //                       spreadRadius: 3.0
+  //                   )
+  //                 ]
+  //             ),
+  //             child: Row(
+  //               mainAxisAlignment: MainAxisAlignment.spaceAround,
+  //               children: [
+  //                 IconButton(icon: Icon(Icons.remove, color: Colors.green,), onPressed: () {
+  //                   Timer(
+  //                       Duration(seconds: 3),
+  //                           () {
+  //                         setState(() {
+  //                           counter = !counter;
+  //                         });
+  //                       });
+  //                 }),
+  //                 Text('1'),
+  //                 IconButton(icon: Icon(Icons.add, color: Colors.green,), onPressed: () {
+  //                   Timer(
+  //                       Duration(seconds: 3),
+  //                           () {
+  //                         setState(() {
+  //                           counter = !counter;
+  //                         });
+  //                       });
+  //                 }),
+  //               ],
+  //             ),
+  //           ) : IconButton(icon: Icon(Icons.add_circle_outline_rounded, color: Colors.green, size: 32,), onPressed: () {
+  //             setState(() {
+  //               counter = !counter;
+  //             });
+  //           }, padding: EdgeInsets.all(0),),
+  //         )
+  //       ],
+  //     ),
+  //   );
+  // }
+}
+
+class ProductsListViewWidget extends StatelessWidget {
+  final List<Product> products;
+
+  ProductsListViewWidget({this.products});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      scrollDirection: Axis.horizontal,
+      itemCount: products.length,
+      itemBuilder: (context, index) => ProductItemWidget(
+        products[index],
+        // products[i].title,
+        // products[i].imageUrl,
+      ),
+    );
+  }
+}
+
+class ProductItemWidget extends StatefulWidget {
+  final Product product;
+
+  ProductItemWidget(this.product);
+
+  @override
+  _ProductItemWidgetState createState() => _ProductItemWidgetState();
+}
+
+class _ProductItemWidgetState extends State<ProductItemWidget> {
+
+  @override
+  void initState() {
+    super.initState();
+    _getCartId();
+  }
+
+  int cartId;
+  int quantity = 0;
+  bool isPressed = false;
+
+  _getCartId() {
+    Pref.loadCartId().then((id) {
+      setState(() {
+        cartId = id;
+      });
+    });
+  }
+
+ @override
+  Widget build(BuildContext context) {
+    final cartItemList = Provider.of<CartItemList>(context, listen: false);
+
+    void updateItemCart(int quantity) {
+      if(quantity > 0) {
+        cartItemList.addItem(cartItem:  CartItem(quantity: quantity, price: quantity * double.parse(widget.product.price), cart: 2, product: widget.product.id));
+      } else {
+        cartItemList.removeItem(cartItem:  CartItem(quantity: quantity, price: quantity * double.parse(widget.product.price), cart: 2, product: widget.product.id));
+      }
+    }
+
+    void feelPressFunc() {
+      setState(() {
+        isPressed = true;
+      });
+      if(isPressed) {
+        Timer(
+            Duration(seconds: 5),
+                () {
+              setState(() {
+                isPressed = false;
+              });
+            }
+        );
+      }
+    }
+
     return Container(
       margin: EdgeInsets.only(left: 10, right: 10, bottom: 10),
       width: 140,
@@ -262,7 +429,9 @@ class _HomePageState extends State<HomePage> {
         children: [
           GestureDetector(
             onTap: () {
-              Navigator.pushNamed(context, DetailPage.id);
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => DetailPage(product: widget.product,))
+              );
             },
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -272,7 +441,7 @@ class _HomePageState extends State<HomePage> {
                   width: 140,
                   decoration: BoxDecoration(
                     image: DecorationImage(
-                      image: NetworkImage(product.image),
+                      image: NetworkImage(widget.product.image),
                     ),
                   ),
                   alignment: Alignment.topLeft,
@@ -288,63 +457,112 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 SizedBox(height: 5,),
-                Text("${product.name.length <= 36 ? product.name : product.name.substring(0, 36)}", style: TextStyle(fontWeight: FontWeight.w400),),
+                Text("${widget.product.name.length <= 36 ? widget.product.name : widget.product.name.substring(0, 36)}", style: TextStyle(fontWeight: FontWeight.w400),),
                 SizedBox(height: 5,),
-                Expanded(child: Text("Price: ${product.price} so'm", style: TextStyle(color: Colors.green, fontSize: 16),)),
+                Expanded(child: Text("Price: ${widget.product.price} so'm", style: TextStyle(color: Colors.green, fontSize: 16),)),
               ],
             ),
           ),
 
           Align(
             alignment: Alignment.topRight,
-            child: counter ? Container(
-              margin: EdgeInsets.all(5),
-              height: 40,
-              width: 120,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5),
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.black.withOpacity(0.25),
-                        offset: new Offset(0.0, 0.0),
-                        blurRadius: 5.0,
-                        spreadRadius: 3.0
-                    )
-                  ]
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  IconButton(icon: Icon(Icons.remove, color: Colors.green,), onPressed: () {
-                    Timer(
-                        Duration(seconds: 3),
-                            () {
+            child: Stack(
+              children: [
+                // icon button
+                InkWell(
+                  onTap: () {
+                    setState(() {
+                      quantity++;
+                    });
+                    cartItemList.addItem(cartItem:  CartItem(quantity: quantity, price: quantity * double.parse(widget.product.price), cart: 2, product: widget.product.id));
+                    // cartni ham o'yla
+                    //cartItemList.addItemWithApi(context: context, cartItem: CartItem(quantity: quantity, price: quantity * double.parse(widget.product.price), cart: 2, product: widget.product.id),);
+                    feelPressFunc();
+                  },
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(32),
+                    child: Icon(
+                      Icons.add_circle_outline_rounded,
+                      color: Colors.green,
+                      size: 32,
+                    ),
+                  ),
+                ),
+
+                isPressed ? Container(
+                  margin: EdgeInsets.all(5),
+                  height: 40,
+                  width: 120,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.black.withOpacity(0.25),
+                            offset: new Offset(0.0, 0.0),
+                            blurRadius: 5.0,
+                            spreadRadius: 3.0
+                        )
+                      ]
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      IconButton(icon: Icon(Icons.remove, color: Colors.green,), onPressed: () {
+                        feelPressFunc();
+                        if(quantity == 0) {
                           setState(() {
-                            counter = !counter;
+                            quantity--;
                           });
-                        });
-                  }),
-                  Text('1'),
-                  IconButton(icon: Icon(Icons.add, color: Colors.green,), onPressed: () {
-                    Timer(
-                        Duration(seconds: 3),
-                            () {
+                          updateItemCart(quantity);
                           setState(() {
-                            counter = !counter;
+                            isPressed = false;
                           });
+                        } else if(quantity >= 1) {
+                          setState(() {
+                            quantity--;
+                          });
+                          updateItemCart(quantity);
+                        } else {
+                          setState(() {
+                            quantity = 0;
+                          });
+                          updateItemCart(quantity);
+                        }
+                      }),
+                      Text(quantity.toString()),
+                      IconButton(icon: Icon(Icons.add, color: Colors.green,), onPressed: () {
+                        feelPressFunc();
+                        setState(() {
+                          quantity++;
                         });
-                  }),
-                ],
-              ),
-            ) : IconButton(icon: Icon(Icons.add_circle_outline_rounded, color: Colors.green, size: 32,), onPressed: () {
-              setState(() {
-                counter = !counter;
-              });
-            }, padding: EdgeInsets.all(0),),
-          )
+                        updateItemCart(quantity);
+                      }),
+                    ],
+                  ),
+                ) : SizedBox.shrink(),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 }
+
+
+// like itemdagi
+/*
+ Consumer<Product>(
+            builder: (ctx, product, _) => IconButton(
+                  icon: Icon(
+                    product.isFavorite ? Icons.favorite : Icons.favorite_border,
+                  ),
+                  color: Theme.of(context).accentColor,
+                  onPressed: () {
+                    product.toggleFavoriteStatus();
+                  },
+                ),
+          )
+ */
+

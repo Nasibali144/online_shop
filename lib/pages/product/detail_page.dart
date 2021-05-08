@@ -1,50 +1,74 @@
 import 'package:flutter/material.dart';
+import 'package:online_shop/models/cart_item_model.dart';
 import 'package:online_shop/models/product_model.dart';
 import 'package:online_shop/pages/product/cart_page.dart';
-import 'package:online_shop/services/http_service.dart';
-import 'package:online_shop/widgets/product_cart%20_widget.dart';
-import 'package:online_shop/widgets/product_category_widget.dart';
+import 'package:online_shop/widgets/badge_widget.dart';
 import 'package:online_shop/widgets/slider_widget.dart';
+import 'package:provider/provider.dart';
 
 class DetailPage extends StatefulWidget {
 
   static final String id = 'detail_page';
+  final Product product;
+  DetailPage({this.product});
 
   @override
   _DetailPageState createState() => _DetailPageState();
 }
 
 class _DetailPageState extends State<DetailPage> {
-  List<String> productImage = [
-    'assets/images/product/product_2.jpg',
-    'assets/images/product/product_3.webp',
-  ];
 
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    _getApiProductList();
-  }
+  // List<String> productImage = [
+  //   'assets/images/product/product_2.jpg',
+  //   'assets/images/product/product_3.webp',
+  // ];
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   _getApiProduct();
+  // }
 
   //////// product
-  List<Product> _products = new List();
-
-  _getApiProductList() {
-    Network.GET(Network.API_PRODUCT, Network.paramEmpty())
-        .then((response) => {_checkResponseProduct(response)});
-  }
-
-  _checkResponseProduct(String response) {
-    if (response != null) {
-      setState(() {
-        _products = Network.parseProList(response).products;
-      });
-    }
-  }
+  // Product product;
+  //
+  // _getApiProduct() {
+  //   Network.GET(Network.API_PRODUCT + '${widget.productId.toString()}/', Network.paramEmpty())
+  //       .then((response) => {_checkResponseProduct(response)});
+  // }
+  //
+  // _checkResponseProduct(String response) {
+  //   if (response != null) {
+  //     setState(() {
+  //       product = Network.parseOneProduct(response);
+  //     });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
+
+    int quantity = 0;
+
+    final loadedProduct = widget.product;
+    final cartItemList = Provider.of<CartItemList>(context, listen: false);
+    bool getCartItem = false;
+    if(cartItemList.findByProductId(loadedProduct.id)!= null) {
+      setState(() {
+        quantity = cartItemList.findByProductId(loadedProduct.id).quantity;
+        getCartItem = ! getCartItem;
+      });
+    }
+
+
+    void updateItemCart(int quantity) {
+      if(quantity > 0) {
+        cartItemList.addItem(cartItem:  CartItem(quantity: quantity, price: quantity * double.parse(loadedProduct.price), cart: 2, product: loadedProduct.id));
+      } else {
+        cartItemList.removeItem(cartItem:  CartItem(quantity: quantity, price: quantity * double.parse(loadedProduct.price), cart: 2, product:  loadedProduct.id));
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -54,9 +78,24 @@ class _DetailPageState extends State<DetailPage> {
             Navigator.pop(context);
           },
         ),
-        title: Text('Mahsulot nomi', style: TextStyle(color: Colors.black),),
+        title: Text(loadedProduct.name, style: TextStyle(color: Colors.black),),
         actions: [
-          IconButton(icon: Icon(Icons.shopping_cart, color: Colors.green,), onPressed: () {})
+          //Navigator.pushNamed(context, CartPage.id);
+          Consumer<CartItemList>(
+            builder: (context, cart, ch) => Badge(
+              child: ch,
+              value: cart.itemCount.toString(),
+            ),
+            child: IconButton(
+              icon: Icon(
+                Icons.shopping_cart,
+                color: Colors.green,
+              ),
+              onPressed: () {
+                Navigator.pushNamed(context, CartPage.id);
+              },
+            ),
+          ),
         ],
       ),
       body: SingleChildScrollView(
@@ -88,7 +127,7 @@ class _DetailPageState extends State<DetailPage> {
                     child: Stack(
                       children: [
                         SliderWidget(
-                          images: productImage,
+                          images: [loadedProduct.image],
                           size: (MediaQuery.of(context).size.width - 30) / 265,
                         ),
                         Align(
@@ -105,7 +144,15 @@ class _DetailPageState extends State<DetailPage> {
                                 ),
                                 child: Text("-12 %", style: TextStyle(color: Colors.white),),
                               ),
-                              IconButton(icon: Icon(Icons.favorite_border, size: 30, color: Colors.green,), onPressed: () {}),
+                              IconButton(
+                                icon: Icon(
+                                  loadedProduct.isFavorite ? Icons.favorite : Icons.favorite_border,
+                                ),
+                                color: Theme.of(context).accentColor,
+                                onPressed: () {
+                                  loadedProduct.toggleFavoriteStatus();
+                                },
+                              ),
                             ],
                           ),
                         ),
@@ -114,20 +161,21 @@ class _DetailPageState extends State<DetailPage> {
                   ),
                   Divider(),
                   SizedBox(height: 7.5,),
-                  Text('Maxsulot nomi', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),),
+                  Text( loadedProduct.name, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),),
                   SizedBox(height: 7.5,),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text('23 950', style: TextStyle(fontSize: 20, color: Colors.green),),
+                      Text(loadedProduct.price, style: TextStyle(fontSize: 20, color: Colors.green),),
                       Text(" so'mga ", style: TextStyle(color: Colors.grey),),
                       Text("1", style: TextStyle(fontSize: 18),),
-                      Text(" dona", style: TextStyle(color: Colors.grey),),
+                      Text(" donasi", style: TextStyle(color: Colors.grey),),
                     ],
                   ),
                   SizedBox(height: 7.5,),
-                  Container(
+                  // o'zgaradigan joy
+                  !getCartItem ? Container(
                     height: 45,
                     width: double.infinity,
                     margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
@@ -139,11 +187,70 @@ class _DetailPageState extends State<DetailPage> {
                       child: Text("Savatga qo'shish"),
                       textColor: Colors.white,
                       onPressed: () {
-                        // ## counter bo'ladi ##
-                        //Navigator.pushReplacementNamed(context, CartPage.id);
+                        setState(() {
+                          quantity++;
+                          getCartItem = !getCartItem;
+                        });
+                        cartItemList.addItem(cartItem:  CartItem(quantity: quantity, price: quantity * double.parse(widget.product.price), cart: 2, product: widget.product.id));
+
                       },
                     ),
-                  ),
+                  ): Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                          height: 45,
+                          width: 60,
+                          decoration: BoxDecoration(
+                            color: Colors.green,
+                            borderRadius: BorderRadius.circular(5)
+                          ),
+                          child: IconButton(
+                            icon: Icon(Icons.remove, color: Colors.white,),
+                            onPressed: () {
+                              if(quantity >= 1) {
+                                setState(() {
+                                  quantity--;
+                                });
+                                updateItemCart(quantity);
+                              } else {
+                                setState(() {
+                                  quantity = 0;
+                                  getCartItem = !getCartItem;
+                                });
+                                updateItemCart(quantity);
+                              }
+                            },
+                          ),
+                        ),
+                        Container(
+                          width: 30,
+                          height: 45,
+                          child: Center(child: Text(quantity.toString(), style: TextStyle(color: Colors.black, fontSize: 20),)),
+                        ),
+                        Container(
+                          height: 45,
+                          width: 60,
+                          margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                          decoration: BoxDecoration(
+                              color: Colors.green,
+                              borderRadius: BorderRadius.circular(5)
+                          ),
+                          child: IconButton(
+                            icon: Icon(Icons.add, color: Colors.white,),
+                            onPressed: () {
+                              setState(() {
+                                quantity++;
+                              });
+                              updateItemCart(quantity);
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
                 ],
               ),
             ),
@@ -151,6 +258,7 @@ class _DetailPageState extends State<DetailPage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text("MAHSULOT TA'RIFI", style: TextStyle(fontSize: 16),),
+              //https://medium.com/flutter-community/parsing-html-in-dart-with-html-package-cd43c29cc460
             ),
             SizedBox(height: 10,),
             Container(
@@ -168,7 +276,8 @@ class _DetailPageState extends State<DetailPage> {
                     ),
                   ]
               ),
-              child: Text("Его популяризации в новое время послужили публикация листов Letraset с образцами Lorem Ipsum в 60-х годах и, в более недавнее время, программы электронной вёрстки типа Aldus PageMaker, в шаблонах которых используется Lorem Ipsum."),
+              child: //Text(loadedProduct.description),
+              Text(loadedProduct.description),
             ),
             Container(
               margin: EdgeInsets.symmetric(horizontal: 10, vertical: 20),

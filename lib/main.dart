@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:online_shop/models/cart_model.dart';
+import 'package:online_shop/models/category_model.dart';
+import 'package:online_shop/models/order_model.dart';
 import 'package:online_shop/pages/address/add_address_page.dart';
 import 'package:online_shop/pages/authentication/create_login_page.dart';
 import 'package:online_shop/pages/authentication/create_registration_page.dart';
 import 'package:online_shop/pages/payment_delivery/add_bank_card_page.dart';
 import 'package:online_shop/pages/address/address_list_page.dart';
+import 'package:online_shop/pages/payment_delivery/bank_card_list_page.dart';
+import 'package:online_shop/pages/payment_delivery/orders_history_page.dart';
 import 'package:online_shop/pages/product/cart_page.dart';
 import 'package:online_shop/pages/address/change_address_page.dart';
 import 'package:online_shop/pages/authentication/create_account_page.dart';
@@ -30,6 +35,9 @@ import 'package:online_shop/pages/test_page.dart';
 import 'package:online_shop/services/pref_service.dart';
 import 'package:provider/provider.dart';
 import 'models/account/user_data.dart';
+import 'models/bank_card_model.dart';
+import 'models/cart_item_model.dart';
+import 'models/product_model.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,17 +46,41 @@ void main() async{
 }
 
 class MyApp extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => UserData(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => UserData(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => CartItemList(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => ProductList(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => CategoryList(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => Cart(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => Orders(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => BankCardList(),
+        ),
+      ],
       child: MaterialApp(
         title: 'Flutter Demo',
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
         home: SplashPage(),
-        //home: CreateAccount(),
+        //home: TestPage(),
         routes: {
           HomePage.id: (context) => HomePage(),
           IntroPage.id: (context) => IntroPage(),
@@ -60,6 +92,7 @@ class MyApp extends StatelessWidget {
           ViewedProductPage.id: (context) => ViewedProductPage(),
           CartPage.id: (context) => CartPage(),
           AddBankCard.id: (context) => AddBankCard(),
+          BankCardListPage.id: (context) => BankCardListPage(),
           FavoriteProductsPage.id: (context) => FavoriteProductsPage(),
           AddressListPage.id: (context) => AddressListPage(),
           AddAddressPage.id: (context) => AddAddressPage(),
@@ -77,10 +110,10 @@ class MyApp extends StatelessWidget {
           PublicOffer.id: (context) => PublicOffer(),
           //
 
-
           //
           CreateRegistrationPage.id: (context) => CreateRegistrationPage(),
           CreateLoginPage.id: (context) => CreateLoginPage(),
+          OrdersHistoryPage.id: (context) => OrdersHistoryPage(),
 
           //
           TestPage.id: (context) => TestPage(),

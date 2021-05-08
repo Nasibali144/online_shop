@@ -5,6 +5,7 @@ import 'package:online_shop/models/account/user_model.dart';
 import 'package:online_shop/pages/authentication/create_login_page.dart';
 import 'package:online_shop/pages/home_page.dart';
 import 'package:online_shop/services/http_auth.dart';
+import 'package:online_shop/services/http_cart.dart';
 import 'package:online_shop/services/manage_route.dart';
 import 'package:online_shop/services/pref_service.dart';
 import 'package:online_shop/utils/dialog_util.dart';
@@ -69,6 +70,7 @@ class _CreateRegistrationPageState extends State<CreateRegistrationPage> {
       setState(() {
         isLoading = false;
       });
+
 
       //// for Auth Status
       Pref.removeAuthStatus().then((value) {

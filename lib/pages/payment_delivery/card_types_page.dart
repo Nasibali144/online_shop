@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:online_shop/pages/payment_delivery/approve_order_page.dart';
 
+import 'bank_card_list_page.dart';
+
 class CardTypes extends StatefulWidget {
 
   static final String id = "card_type";
@@ -32,50 +34,37 @@ class _CardTypesState extends State<CardTypes> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             SizedBox(height: 20),
-            Container(
-              child: ListTile(
-                onTap: () {
-                  Navigator.pushNamed(context, ApproveOrder.id);
-                },
-                leading: Icon(
-                  Icons.credit_card_outlined,
-                  color: Colors.blue,
-                ),
-                title: Text('Uzcard'),
-                trailing: Icon(Icons.keyboard_arrow_right),
+            ListTile(
+              tileColor: Colors.white,
+              onTap: () {
+                Navigator.pushNamed(context, BankCardListPage.id);
+              },
+              leading: Icon(
+                Icons.credit_card_outlined,
+                color: Colors.blue,
               ),
-              color: Colors.white,
-              width: double.infinity,
+              title: Text('Uzcard'),
+              trailing: Icon(Icons.keyboard_arrow_right),
             ),
             Divider(
               height: 2,
             ),
             SizedBox(height: 20),
-            Container(
-              child: ListTile(
-                onTap: () {
-                  Navigator.pushNamed(context, ApproveOrder.id);
-                },
-                leading: Icon(Icons.wallet_giftcard, color: Colors.green),
-                title: Text('Visa'),
-              ),
-
-              color: Colors.white,
-              width: double.infinity,
-
-              // padding: EdgeInsets.all(10),
-              // child: Card(),
+            ListTile(
+              tileColor: Colors.white,
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => ApproveOrder(msg: "Bank Kartasi", choiceCard: 'MasterCard',)));
+              },
+              leading: Icon(Icons.wallet_giftcard, color: Colors.green),
+              title: Text('MasterCard'),
             ),
-            Container(
-              child: ListTile(
-                onTap: () {
-                  Navigator.pushNamed(context, ApproveOrder.id);
-                },
-                leading: Icon(Icons.payments_outlined, color: Colors.red),
-                title: Text('Visa'),
-              ),
-              color: Colors.white,
-              width: double.infinity,
+            ListTile(
+              tileColor: Colors.white,
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => ApproveOrder(msg: "Bank Kartasi", choiceCard: 'Visa',)));
+              },
+              leading: Icon(Icons.payments_outlined, color: Colors.red),
+              title: Text('Visa'),
             ),
           ],
         ),

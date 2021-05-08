@@ -1,16 +1,43 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
+import 'package:online_shop/models/cart_item_model.dart';
+import 'package:online_shop/models/order_model.dart';
+import 'package:online_shop/models/product_model.dart';
+import 'package:online_shop/pages/home_page.dart';
+import 'package:online_shop/pages/payment_delivery/orders_history_page.dart';
+import 'package:online_shop/utils/msg_util.dart';
+import 'package:provider/provider.dart';
 
 class ApproveOrder extends StatefulWidget {
-
   static final String id = "approve_order_page";
+
+  final String msg;
+  final String choiceCard;
+
+  ApproveOrder({this.msg, this.choiceCard});
 
   @override
   _ApproveOrderState createState() => _ApproveOrderState();
 }
 
 class _ApproveOrderState extends State<ApproveOrder> {
+
+  _pressButton(BuildContext context, CartItemList cartItemList) {
+
+    Provider.of<Orders>(context, listen: false).addOrder(
+      cartItemList.items,
+      cartItemList.totalAmount,
+    );
+    cartItemList.clear();
+    MsgUtil.fireToast("Buyurtmalaringiz qabul qilindi belgilangan vaqtga yetkazib beriladi!");
+    Navigator.of(context).pushNamedAndRemoveUntil(OrdersHistoryPage.id, ModalRoute.withName(HomePage.id));
+  }
+
   @override
   Widget build(BuildContext context) {
+    final cartItemList = Provider.of<CartItemList>(context, listen: false);
+
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
@@ -19,9 +46,14 @@ class _ApproveOrderState extends State<ApproveOrder> {
           'Buyurtmani tasdiqlash',
           style: TextStyle(color: Colors.black),
         ),
-        leading: Icon(
-          Icons.arrow_back,
-          color: Colors.black,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: Colors.black,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
         elevation: 1,
       ),
@@ -33,38 +65,50 @@ class _ApproveOrderState extends State<ApproveOrder> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  SizedBox(height: 20),
+                  SizedBox(height: 10),
                   Container(
                     child: ListTile(
                       leading: Icon(
                         Icons.timelapse,
                       ),
-                      title: Text('Yetqazib berish vaxti'),
-                      subtitle: Text('Bugun soat 18:00 dan 19:00 gacha'),
-                      trailing: Icon(Icons.keyboard_arrow_right),
+                      title: Text('Yetkazib berish vaqti'),
+                      subtitle: Text(
+                          "${DateFormat("yyyy-MM-dd HH:mm").format(Provider.of<Orders>(context, listen: false).dateTime)}"),
+                     // trailing: Icon(Icons.keyboard_arrow_right),
                     ),
                     color: Colors.white,
                     width: double.infinity,
                   ),
-                  SizedBox(height: 20),
+                  SizedBox(height: 10),
                   Container(
                     child: ListTile(
                       leading: Icon(
                         Icons.shopping_cart,
                       ),
-                      title: Text('1 dona mahsulot'),
+                      title: Text('${cartItemList.items.length} dona mahsulot'),
                     ),
                     color: Colors.white,
                     width: double.infinity,
                   ),
                   Container(
-                    child: ListTile(
-                      leading: Image.asset('assets/images/splash/datasite_logo.png'),
+                    height: 60,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: cartItemList.items.length,
+                      itemBuilder: (context, index) {
+                        CartItem cartItem = cartItemList.items[index];
+                        Product product = Provider.of<ProductList>(context, listen: false).findById(cartItem.product);
+                        return Container(
+                          margin: EdgeInsets.symmetric(horizontal: 10, vertical: 2.5),
+                          height: 55,
+                          child: Image.network(product.image),
+                        );
+                      },
                     ),
                     color: Colors.white,
                     width: double.infinity,
                   ),
-                  SizedBox(height: 20),
+                  SizedBox(height: 10),
                   Container(
                     child: ListTile(
                       leading: Icon(
@@ -80,18 +124,19 @@ class _ApproveOrderState extends State<ApproveOrder> {
                     height: 1,
                   ),
                   Container(
+                    padding: EdgeInsets.symmetric(horizontal: 15),
                     child: TextField(
                       decoration: InputDecoration(
                           border: InputBorder.none,
                           hintText:
-                          'misol uchun , yetib kelganingizda qongiroq qiling...'),
+                              'Misol uchun, yetib kelganingizda qongiroq qiling...'),
                     ),
                     color: Colors.white,
                     height: 100,
                     width: double.infinity,
                   ),
                   SizedBox(
-                    height: 20,
+                    height: 10,
                   ),
                   Container(
                       color: Colors.white,
@@ -105,24 +150,34 @@ class _ApproveOrderState extends State<ApproveOrder> {
                   Divider(
                     height: 1,
                   ),
-                  Container(
-                      color: Colors.white,
-                      width: double.infinity,
-                      child: ListTile(
-                        leading: Text('Tolov usuli'),
-                        trailing: Text('Bank Kartasi'),
-                      )),
-                  Divider(
-                    thickness: 1,
-                    height: 1,
+                  widget.msg.contains("Naqd Pulda")  ? Container(color: Colors.white,
+                width: double.infinity,
+                child: ListTile(
+                  leading: Text('Tolov usuli'),
+                  trailing: Text(widget.msg),
+                )) : Column(
+                    children: [
+                      Container(
+                          color: Colors.white,
+                          width: double.infinity,
+                          child: ListTile(
+                            leading: Text('Tolov usuli'),
+                            trailing: Text('Bank Kartasi'),
+                          )),
+                      Divider(
+                        thickness: 1,
+                        height: 1,
+                      ),
+                      Container(
+                          color: Colors.white,
+                          width: double.infinity,
+                          child: ListTile(
+                            leading: Text('Karta turi'),
+                            trailing: Text("${widget.choiceCard}"),
+                          )),
+                    ],
                   ),
-                  Container(
-                      color: Colors.white,
-                      width: double.infinity,
-                      child: ListTile(
-                        leading: Text('Karta turi'),
-                        trailing: Text('UZCARD'),
-                      )),
+
                   Divider(
                     thickness: 1,
                     height: 1,
@@ -132,7 +187,7 @@ class _ApproveOrderState extends State<ApproveOrder> {
                       width: double.infinity,
                       child: ListTile(
                         leading: Text('Mahsulotlarning narxi'),
-                        trailing: Text('2990 som'),
+                        trailing: Text("${cartItemList.totalAmount.toStringAsFixed(0)} so'm"),
                       )),
                   Divider(
                     thickness: 1,
@@ -158,19 +213,25 @@ class _ApproveOrderState extends State<ApproveOrder> {
                           style: TextStyle(color: Colors.green),
                         ),
                         trailing: Text(
-                          '2 990 som',
+                          "${cartItemList.totalAmount.toStringAsFixed(0)} so'm",
                           style: TextStyle(color: Colors.green),
                         ),
                       )),
-                  Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: RaisedButton(
+                  Container(
+                    margin:  EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+                    decoration: BoxDecoration(
+                      color: Colors.green,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: FlatButton(
+                      padding: EdgeInsets.all(0),
                         child: Text(
                           'Buyurtma berish',
-                          style: TextStyle(color: Colors.white, fontSize: 15),
+                          style: TextStyle(color: Colors.white, fontSize: 16),
                         ),
-                        color: Colors.green,
-                        onPressed: () {}),
+                        onPressed: () {
+                          _pressButton(context, cartItemList);
+                        },),
                   )
                 ],
               ),

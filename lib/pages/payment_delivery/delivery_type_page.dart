@@ -18,7 +18,7 @@ class _DeliveryTypeState extends State<DeliveryType> {
       appBar: AppBar(
         elevation: 1,
         backgroundColor: Colors.white,
-        leading: Icon(Icons.arrow_back, color: Colors.black),
+        leading: IconButton(icon: Icon(Icons.arrow_back, color: Colors.black), onPressed: () => Navigator.pop(context),),
         title: Text('Yetkazib berish usulini tanlang',
             style: TextStyle(color: Colors.black)),
       ),
@@ -27,40 +27,28 @@ class _DeliveryTypeState extends State<DeliveryType> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              GestureDetector(
+              ListTile(
+                tileColor: Colors.white,
                 onTap: () {
                   Navigator.pushNamed(context, TableDeliveryPage.id);
                 },
-                child: Container(
-                    color: Colors.white,
-                    width: double.infinity,
-                    child: ListTile(
-                      leading: Icon(Icons.access_time),
-                      title: Text('Jadval asosida yetkazib berish'),
-                      subtitle: Text('Pulingizni tejang'),
-                      trailing: Icon(Icons.keyboard_arrow_right),
-                    )),
+                leading: Icon(Icons.access_time),
+                title: Text('Jadval asosida yetkazib berish'),
+                subtitle: Text('Pulingizni tejang'),
+                trailing: Icon(Icons.keyboard_arrow_right),
               ),
               Divider(
                 height: 2,
               ),
-              GestureDetector(
+              ListTile(
+                tileColor: Colors.white,
                 onTap: () {
                   Navigator.pushNamed(context, FastDeliveryPage.id);
                 },
-                child: Container(
-                  child: ListTile(
-                    leading: Icon(Icons.airplanemode_active),
-                    title: Text('Tezkor  yetkazib berish'),
-                    subtitle: Text('Vaxtingizni tejang'),
-                    trailing: Icon(Icons.keyboard_arrow_right),
-                  ),
-                  color: Colors.white,
-                  width: double.infinity,
-
-                  // padding: EdgeInsets.all(10),
-                  // child: Card(),
-                ),
+                leading: Icon(Icons.airplanemode_active),
+                title: Text('Tezkor  yetkazib berish'),
+                subtitle: Text('Vaxtingizni tejang'),
+                trailing: Icon(Icons.keyboard_arrow_right),
               ),
             ],
           )),
